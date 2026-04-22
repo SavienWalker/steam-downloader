@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SteamDL — Puan Dükkanı İndirici</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0f1a;
+  --bg2:#0d1420;
+  --card:#111827;
+  --card2:#151f2e;
+  --border:#1e2d42;
+  --border2:#243447;
+  --blue:#3b9eff;
+  --blue2:#1a78d4;
+  --glow:rgba(59,158,255,.15);
+  --text:#e2eaf5;
+  --muted:#5a7a9a;
+  --accent:#66c0f4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* BG EFFECT */
+body::before{content:'';position:fixed;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(59,158,255,.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-200px;right:-200px;width:500px;height:500px;background:radial-gradient(circle,rgba(100,60,255,.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+
+/* NAVBAR */
+nav{position:sticky;top:0;z-index:200;background:rgba(10,15,26,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;gap:0}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;margin-right:40px;text-decoration:none}
+.nav-logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--blue),#6644ff);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.nav-logo-icon svg{width:20px;height:20px;fill:#fff}
+.nav-logo-text{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.5px}
+.nav-logo-text span{color:var(--blue)}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-link{display:flex;align-items:center;gap:7px;color:var(--muted);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:.875rem;font-weight:500;transition:.2s;border:none;background:none}
+.nav-link svg{width:16px;height:16px;fill:currentColor}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.nav-link.active{color:var(--blue);background:rgba(59,158,255,.1)}
+.nav-badge{background:var(--blue);color:#fff;font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:20px;margin-left:2px}
+
+/* PAGES */
+.page{display:none;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ===== ANASAYFA ===== */
+.hero{text-align:center;padding:80px 24px 50px;max-width:800px;margin:0 auto}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(59,158,255,.1);border:1px solid rgba(59,158,255,.2);color:var(--blue);font-size:.78rem;font-weight:600;padding:5px 12px;border-radius:20px;margin-bottom:20px;letter-spacing:.3px}
+.hero-tag svg{width:13px;height:13px;fill:var(--blue)}
+.hero h1{font-size:3rem;font-weight:800;color:#fff;line-height:1.15;margin-bottom:16px;letter-spacing:-1px}
+.hero h1 .grad{background:linear-gradient(135deg,var(--blue),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:1.05rem;line-height:1.7;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
+.hero-search{display:flex;gap:8px;max-width:520px;margin:0 auto;position:relative}
+.hero-search input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);padding:14px 18px;border-radius:12px;font-size:.95rem;outline:none;font-family:'Inter',sans-serif;transition:.2s;backdrop-filter:blur(10px)}
+.hero-search input:focus{border-color:var(--blue);background:rgba(59,158,255,.05);box-shadow:0 0 0 3px var(--glow)}
+.hero-search input::placeholder{color:var(--muted)}
+
+.stats-row{display:flex;justify-content:center;gap:32px;margin-top:40px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-size:1.6rem;font-weight:800;color:#fff}
+.stat-label{font-size:.75rem;color:var(--muted);margin-top:2px}
+
+.section{max-width:1200px;margin:0 auto;padding:0 24px 60px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.section-title{font-size:1rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.section-title svg{width:18px;height:18px;fill:var(--blue)}
+
+.popular-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.game-tile{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:.25s;position:relative}
+.game-tile::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.8));pointer-events:none}
+.game-tile:hover{border-color:var(--blue);transform:translateY(-4px);box-shadow:0 12px 40px rgba(59,158,255,.15)}
+.game-tile img{width:100%;height:100px;object-fit:cover;display:block;transition:.3s}
+.game-tile:hover img{transform:scale(1.05)}
+.game-tile .gt-info{padding:12px;position:relative;z-index:1}
+.game-tile .gt-name{font-size:.85rem;color:#fff;font-weight:600;margin-bottom:3px}
+.game-tile .gt-id{font-size:.7rem;color:var(--muted)}
+.game-tile .gt-arrow{position:absolute;top:12px;right:12px;width:24px;height:24px;background:rgba(59,158,255,.15);border-radius:6px;display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s}
+.game-tile .gt-arrow svg{width:12px;height:12px;fill:var(--blue)}
+.game-tile:hover .gt-arrow{opacity:1}
+
+/* ===== ORTAK ===== */
+.btn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;border-radius:10px;padding:12px 22px;font-size:.9rem;cursor:pointer;font-weight:600;transition:.2s;font-family:'Inter',sans-serif;white-space:nowrap}
+.btn svg{width:16px;height:16px;fill:currentColor}
+.btn:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,158,255,.3)}
+.btn-sm{padding:8px 16px;font-size:.82rem;border-radius:8px}
+.btn-green{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.btn-green:hover{box-shadow:0 6px 20px rgba(34,197,94,.3)}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--border2)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);box-shadow:none;border-color:var(--blue)}
+
+/* ===== İNDİRME & KEŞFET SAYFASI ===== */
+.page-wrap{max-width:1000px;margin:0 auto;padding:32px 24px}
+.page-title{font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.page-title svg{width:24px;height:24px;fill:var(--blue)}
+
+.search-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}
+.search-card label{display:block;color:var(--accent);font-size:.8rem;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.input-row{display:flex;gap:8px}
+input[type=text],input[type=number]{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);color:var(--text);padding:11px 16px;border-radius:10px;font-size:.92rem;outline:none;font-family:'Inter',sans-serif;transition:.2s}
+input:focus{border-color:var(--blue);background:rgba(59,158,255,.04);box-shadow:0 0 0 3px var(--glow)}
+input::placeholder{color:var(--muted)}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted);font-size:.78rem;font-weight:500}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.hint{font-size:.75rem;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:5px}
+.hint svg{width:13px;height:13px;fill:var(--muted)}
+
+/* Autocomplete */
+.autocomplete-wrap{position:relative;flex:1}
+.ac-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card2);border:1px solid var(--border2);border-radius:12px;z-index:50;max-height:240px;overflow-y:auto;box-shadow:0 16px 40px rgba(0,0,0,.4);display:none}
+.ac-item{padding:10px 14px;cursor:pointer;font-size:.875rem;display:flex;align-items:center;gap:10px;transition:.15s;border-radius:8px;margin:3px}
+.ac-item:hover{background:rgba(59,158,255,.1)}
+.ac-item img{width:46px;height:18px;object-fit:cover;border-radius:3px;background:#0a0f1a}
+.ac-item span{color:var(--text);font-weight:500}
+.ac-item small{color:var(--blue);margin-left:auto;font-size:.72rem;background:rgba(59,158,255,.1);padding:2px 7px;border-radius:6px}
+
+/* Oyun bar */
+.game-bar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.game-bar img{height:40px;border-radius:6px}
+.game-bar strong{color:#fff;font-size:1rem}
+.game-bar span{color:var(--blue);font-size:.8rem}
+
+/* Filtreler */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.fbtn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:500;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.fbtn:hover{color:var(--text);border-color:var(--border2)}
+.fbtn.active{background:rgba(59,158,255,.1);border-color:var(--blue);color:var(--blue)}
+.counter{color:var(--muted);font-size:.82rem;margin-left:auto}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:.25s;position:relative}
+.card:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 10px 30px rgba(59,158,255,.12)}
+.thumb{width:100%;aspect-ratio:1;background:#080d16;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.thumb img,.thumb video{max-width:100%;max-height:100%;object-fit:contain;transition:.3s}
+.card:hover .thumb img,.card:hover .thumb video{transform:scale(1.04)}
+.type-badge{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);color:var(--blue);font-size:.62rem;font-weight:600;padding:3px 7px;border-radius:6px;border:1px solid rgba(59,158,255,.2)}
+.meta{padding:10px}
+.cname{font-size:.75rem;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.ctype{font-size:.68rem;color:var(--muted);margin-bottom:8px}
+.dl{width:100%;background:rgba(59,158,255,.08);border:1px solid rgba(59,158,255,.2);color:var(--blue);border-radius:8px;padding:7px;font-size:.76rem;font-weight:600;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px}
+.dl svg{width:13px;height:13px;fill:var(--blue)}
+.dl:hover{background:rgba(59,158,255,.15);border-color:var(--blue)}
+
+/* Keşfet özel */
+.discover-top{display:grid;grid-template-columns:1fr auto;gap:14px;margin-bottom:24px}
+.random-card{background:linear-gradient(135deg,rgba(59,158,255,.1),rgba(102,68,255,.1));border:1px solid rgba(59,158,255,.2);border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:.25s;min-width:180px;text-align:center}
+.random-card:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 12px 30px rgba(59,158,255,.15)}
+.dice{font-size:2.8rem;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.random-card strong{color:#fff;font-size:.95rem;font-weight:700}
+.random-card p{color:var(--muted);font-size:.78rem;line-height:1.4}
+
+/* Loader */
+.loader{display:none;text-align:center;padding:40px}
+.spin{width:38px;height:38px;border:3px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader p{color:var(--muted);font-size:.88rem}
+
+.error-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px 16px;color:#f87171;font-size:.85rem;margin:10px 0;display:flex;align-items:center;gap:8px}
+.error-box svg{width:16px;height:16px;fill:#f87171;flex-shrink:0}
+.empty{text-align:center;padding:50px;color:var(--muted)}
+
+/* ÖNIZLEME MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:20px;max-width:520px;width:100%;padding:24px;position:relative;transform:scale(.95);transition:.2s;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.07);border:none;color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+.modal-close:hover{background:rgba(255,255,255,.12);color:#fff}
+.modal-preview{width:100%;aspect-ratio:16/9;background:#080d16;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:16px;border:1px solid var(--border)}
+.modal-preview img,.modal-preview video{max-width:100%;max-height:100%;object-fit:contain}
+.modal-name{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:4px}
+.modal-type{font-size:.8rem;color:var(--muted);margin-bottom:16px}
+.modal-actions{display:flex;gap:8px}
+
+/* FAVORİLER */
+.fav-btn{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;z-index:2}
+.fav-btn svg{width:15px;height:15px;fill:var(--muted);transition:.2s}
+.fav-btn.active svg{fill:#f59e0b}
+.fav-btn:hover svg{fill:#f59e0b}
+.fav-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:24px}
+.fav-section-title{font-size:.85rem;font-weight:700;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
+.fav-games{display:flex;gap:8px;flex-wrap:wrap}
+.fav-game-chip{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:6px 12px;cursor:pointer;transition:.2s;font-size:.82rem;color:var(--text);font-weight:500}
+.fav-game-chip:hover{border-color:var(--blue);color:var(--blue)}
+.fav-game-chip img{width:36px;height:14px;object-fit:cover;border-radius:3px}
+.fav-game-chip .rm{color:var(--muted);margin-left:4px;font-size:.9rem;transition:.2s}
+.fav-game-chip:hover .rm{color:#f87171}
+.no-favs{color:var(--muted);font-size:.83rem}
+
+/* GRID BOYUTU */
+.grid.small{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.grid.large{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.grid-toggle{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:3px}
+.gt-btn{background:none;border:none;color:var(--muted);padding:5px 9px;border-radius:6px;cursor:pointer;transition:.2s;display:flex;align-items:center}
+.gt-btn svg{width:15px;height:15px;fill:currentColor}
+.gt-btn.active{background:var(--border2);color:var(--blue)}
+
+/* İSTATİSTİK BARLARI */
+.stats-bar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap}
+.stat-item{display:flex;align-items:center;gap:8px;font-size:.82rem}
+.stat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.stat-item span{color:var(--muted)}
+.stat-item strong{color:#fff}
+
+/* OYUN BİLGİ PANELİ */
+.game-detail{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.game-detail-img{width:184px;height:69px;object-fit:cover;border-radius:8px;border:1px solid var(--border)}
+.game-detail-info{display:flex;flex-direction:column;gap:6px}
+.game-detail-name{font-size:1.05rem;font-weight:700;color:#fff}
+.game-detail-meta{display:flex;gap:10px;flex-wrap:wrap}
+.meta-chip{background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:6px;padding:3px 9px;font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.meta-chip.green{color:#4ade80;border-color:rgba(74,222,128,.2);background:rgba(74,222,128,.05)}
+.meta-chip.blue{color:var(--blue);border-color:rgba(59,158,255,.2);background:rgba(59,158,255,.05)}
+.meta-chip.yellow{color:#fbbf24;border-color:rgba(251,191,36,.2);background:rgba(251,191,36,.05)}
+
+/* ANİMASYON TOGGLE */
+.anim-toggle{display:flex;align-items:center;gap:7px;background:rgba(59,158,255,.08);border:1px solid rgba(59,158,255,.15);border-radius:8px;padding:5px 12px;cursor:pointer;font-size:.78rem;color:var(--blue);font-weight:600;transition:.2s;font-family:'Inter',sans-serif}
+.anim-toggle:hover{background:rgba(59,158,255,.14)}
+.anim-toggle.active{background:rgba(59,158,255,.18);border-color:var(--blue)}
+.anim-toggle svg{width:14px;height:14px;fill:var(--blue)}
+
+/* KLAVYE KISAYOL İPUCU */
+.kbd{display:inline-flex;align-items:center;background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:5px;padding:1px 6px;font-size:.7rem;color:var(--muted);font-family:monospace;margin-left:4px}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- ÖNIZLEME MODAL -->
+<div class="modal-overlay" id="preview-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closePreview()">✕</button>
+    <div class="modal-preview" id="modal-preview"></div>
+    <div class="modal-name" id="modal-name"></div>
+    <div class="modal-type" id="modal-type"></div>
+    <div class="modal-actions">
+      <button class="btn" id="modal-dl-btn" style="flex:1">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        İndir
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-9.95 9h.05a5 5 0 0 1 5-5 5 5 0 0 1 5 5h.05A10 10 0 0 0 12 2zM2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10H2zm10 6a6 6 0 0 1-5.2-3l2.7 1.1a2 2 0 0 0 2.5-1 2 2 0 0 0-1-2.7l-2.8-1.1A6 6 0 0 1 12 18z"/></svg>
+    </div>
+    <span class="nav-logo-text">Steam<span>DL</span></span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Anasayfa
+    </button>
+    <button class="nav-link" onclick="showPage('download')">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      İndir
+    </button>
+    <button class="nav-link" onclick="showPage('discover')">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      Keşfet
+    </button>
+    <button class="nav-link" onclick="showPage('appids')">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+      App ID Rehberi
+    </button>
+  </div>
+</nav>
+
+<!-- ANASAYFA -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-tag">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Steam Puan Dükkanı İndirici
+    </div>
+    <h1>Puan Dükkanı Öğelerini<br><span class="grad">Ücretsiz İndir</span></h1>
+    <p>Favori oyunlarının arka planlarını, emoticonlarını, avatar çerçevelerini ve animasyonlu öğelerini saniyeler içinde indir.</p>
+    <div class="hero-search">
+      <input type="text" id="hero-search" placeholder="Oyun adı veya App ID ara..." onkeydown="if(event.key==='Enter')heroSearch()">
+      <button class="btn" onclick="heroSearch()">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        Ara
+      </button>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num">10+</div><div class="stat-label">Popüler Oyun</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">İndirilebilir Öğe</div></div>
+      <div class="stat"><div class="stat-num">%100</div><div class="stat-label">Ücretsiz</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/></svg>
+        Popüler Oyunlar
+      </div>
+    </div>
+    <div class="popular-grid" id="popular-grid"></div>
+  </div>
+</div>
+
+<!-- İNDİRME -->
+<div class="page" id="page-download">
+  <div class="page-wrap">
+    <div class="page-title">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Öğe İndir
+    </div>
+    <div class="search-card">
+      <label>Oyun Adıyla Ara</label>
+      <div class="input-row">
+        <div class="autocomplete-wrap">
+          <input type="text" id="name-search" placeholder="Örn: Counter-Strike, Stardew Valley..." oninput="onNameInput()" onkeydown="if(event.key==='Enter')searchByName()">
+          <div class="ac-list" id="ac-list"></div>
+        </div>
+        <button class="btn" onclick="searchByName()">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          Ara
+        </button>
+      </div>
+      <div class="divider">veya App ID ile</div>
+      <div class="input-row">
+        <input type="number" id="appid-input" placeholder="730 = CS2 · 570 = Dota 2 · 440 = TF2" onkeydown="if(event.key==='Enter')searchById()">
+        <button class="btn" onclick="searchById()">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          Ara
+        </button>
+      </div>
+      <div class="hint">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        store.steampowered.com/app/<strong>APPID</strong>/oyun-adi
+      </div>
+    </div>
+    <div id="dl-error"></div>
+    <div id="dl-game-info"></div>
+    <div class="loader" id="dl-loader"><div class="spin"></div><p>Öğeler yükleniyor… (15–30 sn sürebilir)</p></div>
+    <div id="dl-results"></div>
+  </div>
+</div>
+
+<!-- KEŞFET -->
+<div class="page" id="page-discover">
+  <div class="page-wrap">
+    <div class="page-title">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      Keşfet
+    </div>
+    <div class="discover-top">
+      <div class="search-card" style="margin:0">
+        <label>Oyun Adıyla Keşfet</label>
+        <div class="input-row">
+          <div class="autocomplete-wrap">
+            <input type="text" id="disc-search" placeholder="Oyun adı yaz..." oninput="onDiscInput()" onkeydown="if(event.key==='Enter')discSearchByName()">
+            <div class="ac-list" id="disc-ac-list"></div>
+          </div>
+          <button class="btn" onclick="discSearchByName()">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            Ara
+          </button>
+        </div>
+      </div>
+      <div class="random-card" onclick="randomGame()">
+        <div class="dice">🎲</div>
+        <strong>Rastgele Oyun</strong>
+        <p>Sürpriz bir oyunun öğelerini keşfet!</p>
+      </div>
+    </div>
+    <div id="disc-error"></div>
+    <div id="disc-game-info"></div>
+    <div class="loader" id="disc-loader"><div class="spin"></div><p>Yükleniyor…</p></div>
+    <div id="disc-results"></div>
+  </div>
+</div>
+
+<!-- APP ID REHBERİ -->
+<div class="page" id="page-appids">
+  <div class="page-wrap" style="max-width:1100px">
+    <div class="page-title">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+      App ID Rehberi
+    </div>
+
+    <!-- Arama -->
+    <div class="search-card" style="margin-bottom:28px">
+      <label>Oyun Adıyla App ID Bul</label>
+      <div class="input-row">
+        <div class="autocomplete-wrap">
+          <input type="text" id="appid-guide-search" placeholder="Oyun adı yaz, App ID'sini bul..." oninput="onGuideInput()" onkeydown="if(event.key==='Enter')guideSearch()">
+          <div class="ac-list" id="guide-ac-list"></div>
+        </div>
+        <button class="btn" onclick="guideSearch()">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          Ara
+        </button>
+      </div>
+      <div id="guide-search-results" style="margin-top:14px"></div>
+    </div>
+
+    <!-- Kategoriler -->
+    <div class="filters" style="margin-bottom:20px" id="cat-filters"></div>
+
+    <!-- Oyun listesi -->
+    <div id="appid-grid"></div>
+  </div>
+</div>
+
+<style>
+.appid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.appid-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:.2s;cursor:pointer}
+.appid-card:hover{border-color:var(--blue);background:var(--card2);transform:translateX(3px)}
+.appid-card img{width:64px;height:24px;object-fit:cover;border-radius:4px;background:#080d16;flex-shrink:0}
+.appid-card .ac-info{flex:1;min-width:0}
+.appid-card .ac-name{font-size:.88rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.appid-card .ac-cat{font-size:.7rem;color:var(--muted)}
+.appid-card .ac-id{background:rgba(59,158,255,.1);border:1px solid rgba(59,158,255,.15);color:var(--blue);font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap;font-family:monospace}
+.copy-btn{background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--muted);border-radius:7px;padding:5px 9px;font-size:.72rem;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:4px;font-family:'Inter',sans-serif;white-space:nowrap}
+.copy-btn svg{width:12px;height:12px;fill:currentColor}
+.copy-btn:hover{color:var(--blue);border-color:var(--blue)}
+.copy-btn.copied{color:#22c55e;border-color:#22c55e}
+.cat-tag{font-size:.72rem;font-weight:600;color:var(--muted);padding:2px 8px;background:rgba(255,255,255,.04);border-radius:6px;margin-bottom:4px;display:inline-block}
+.section-group{margin-bottom:32px}
+.section-group-title{font-size:.85rem;font-weight:700;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
+</style>
+
+<script>
+const APPID_DB = {
+  'Ücretsiz':[
+    {name:'Counter-Strike 2',appid:'730'},
+    {name:'Dota 2',appid:'570'},
+    {name:'Team Fortress 2',appid:'440'},
+    {name:'Apex Legends',appid:'1172470'},
+    {name:'Warframe',appid:'230410'},
+    {name:'Path of Exile',appid:'238960'},
+    {name:'Among Us',appid:'945360'},
+    {name:'Brawlhalla',appid:'291550'},
+  ],
+  'Aksiyon':[
+    {name:'Cyberpunk 2077',appid:'1091500'},
+    {name:'Elden Ring',appid:'1245620'},
+    {name:'Dark Souls III',appid:'374320'},
+    {name:'Sekiro',appid:'814380'},
+    {name:'Devil May Cry 5',appid:'601150'},
+    {name:'Doom Eternal',appid:'782330'},
+    {name:'Cuphead',appid:'268910'},
+    {name:'Dead Cells',appid:'588650'},
+  ],
+  'RPG':[
+    {name:'Hades',appid:'1145360'},
+    {name:'Divinity: Original Sin 2',appid:'435150'},
+    {name:'Baldur\'s Gate 3',appid:'1086940'},
+    {name:'The Witcher 3',appid:'292030'},
+    {name:'Stardew Valley',appid:'413150'},
+    {name:'Persona 4 Golden',appid:'1113000'},
+    {name:'Monster Hunter: World',appid:'582010'},
+    {name:'Dragon Age: Origins',appid:'47810'},
+  ],
+  'Strateji':[
+    {name:'Civilization VI',appid:'289070'},
+    {name:'Total War: WARHAMMER III',appid:'1142710'},
+    {name:'Age of Empires IV',appid:'1466860'},
+    {name:'Crusader Kings III',appid:'1158310'},
+    {name:'Stellaris',appid:'281990'},
+    {name:'XCOM 2',appid:'268500'},
+    {name:'Victoria 3',appid:'529340'},
+    {name:'Into the Breach',appid:'590380'},
+  ],
+  'Korku':[
+    {name:'Dead by Daylight',appid:'381210'},
+    {name:'Phasmophobia',appid:'739630'},
+    {name:'Resident Evil 2',appid:'883710'},
+    {name:'Resident Evil Village',appid:'1196590'},
+    {name:'Amnesia: The Bunker',appid:'1944430'},
+    {name:'Little Nightmares',appid:'424840'},
+    {name:'Outlast',appid:'238320'},
+    {name:'Layers of Fear',appid:'391720'},
+  ],
+  'Platform & Indie':[
+    {name:'Hollow Knight',appid:'367520'},
+    {name:'Celeste',appid:'504230'},
+    {name:'Terraria',appid:'105600'},
+    {name:'Ori and the Will of the Wisps',appid:'1057090'},
+    {name:'Shovel Knight',appid:'250760'},
+    {name:'A Short Hike',appid:'1055540'},
+    {name:'Undertale',appid:'391540'},
+    {name:'Disco Elysium',appid:'632470'},
+  ],
+  'Çok Oyunculu':[
+    {name:'Rust',appid:'252490'},
+    {name:'ARK: Survival Evolved',appid:'346110'},
+    {name:'Fall Guys',appid:'1097150'},
+    {name:'Pummel Party',appid:'875010'},
+    {name:'Human: Fall Flat',appid:'477160'},
+    {name:'Garry\'s Mod',appid:'4000'},
+    {name:'Left 4 Dead 2',appid:'550'},
+    {name:'Payday 2',appid:'218620'},
+  ],
+};
+
+let activeGuidecat = 'Tümü';
+
+function buildAppIdPage() {
+  // Kategori filtreleri
+  const cats = ['Tümü', ...Object.keys(APPID_DB)];
+  const catFilters = document.getElementById('cat-filters');
+  catFilters.innerHTML = cats.map(c =>
+    `<button class="fbtn ${c===activeGuidecat?'active':''}" onclick="setGuideCat('${c}')">${c}</button>`
+  ).join('');
+
+  // Grid
+  const grid = document.getElementById('appid-grid');
+  const toShow = activeGuidecat === 'Tümü' ? APPID_DB : {[activeGuidecat]: APPID_DB[activeGuidecat]};
+  grid.innerHTML = Object.entries(toShow).map(([cat, games]) => `
+    <div class="section-group">
+      <div class="section-group-title">${getCatIcon(cat)} ${cat}</div>
+      <div class="appid-grid">
+        ${games.map(g => appidCard(g, cat)).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function appidCard(g, cat) {
+  return `<div class="appid-card" onclick="goDownload('${g.appid}')">
+    <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/capsule_231x87.jpg" onerror="this.style.display='none'">
+    <div class="ac-info">
+      <div class="ac-name">${g.name}</div>
+      <div class="ac-cat">${cat}</div>
+    </div>
+    <span class="ac-id">${g.appid}</span>
+    <button class="copy-btn" onclick="event.stopPropagation();copyId(this,'${g.appid}')">
+      <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+      Kopyala
+    </button>
+  </div>`;
+}
+
+function getCatIcon(cat) {
+  const icons = {'Ücretsiz':'🆓','Aksiyon':'⚔️','RPG':'🧙','Strateji':'♟️','Korku':'👻','Platform & Indie':'🎮','Çok Oyunculu':'👥'};
+  return icons[cat] || '🎮';
+}
+
+function setGuideCat(cat) {
+  activeGuidecat = cat;
+  buildAppIdPage();
+}
+
+function copyId(btn, appid) {
+  navigator.clipboard.writeText(appid);
+  btn.classList.add('copied');
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Kopyalandı`;
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Kopyala`;
+  }, 2000);
+}
+
+// Guide arama
+function onGuideInput() {
+  const v = document.getElementById('appid-guide-search').value.trim();
+  clearTimeout(acTimer);
+  if (v.length < 2) { hideAc('guide-ac-list'); return; }
+  acTimer = setTimeout(() => fetchAc(v, 'guide-ac-list', id => {
+    document.getElementById('appid-guide-search').value = '';
+    showGuideResult(id);
+  }), 400);
+}
+
+async function guideSearch() {
+  const q = document.getElementById('appid-guide-search').value.trim();
+  if (!q) return;
+  hideAc('guide-ac-list');
+  try {
+    const r = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+    const data = await r.json();
+    if (!data.length) {
+      document.getElementById('guide-search-results').innerHTML = `<div class="error-box"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Oyun bulunamadı.</div>`;
+      return;
+    }
+    document.getElementById('guide-search-results').innerHTML = `
+      <div class="appid-grid">
+        ${data.slice(0,6).map(g => appidCard(g, 'Arama Sonucu')).join('')}
+      </div>`;
+  } catch(e) {}
+}
+
+async function showGuideResult(appid) {
+  try {
+    const r = await fetch(`/api/game/${appid}`);
+    const g = await r.json();
+    document.getElementById('guide-search-results').innerHTML = `
+      <div class="appid-grid">
+        ${appidCard({name: g.name, appid: g.appid}, 'Arama Sonucu')}
+      </div>`;
+  } catch(e) {}
+}
+
+buildAppIdPage();
+
+const POPULAR=[
+  {name:'Counter-Strike 2',appid:'730'},
+  {name:'Dota 2',appid:'570'},
+  {name:'Team Fortress 2',appid:'440'},
+  {name:'Stardew Valley',appid:'413150'},
+  {name:'Hades',appid:'1145360'},
+  {name:'Hollow Knight',appid:'367520'},
+  {name:'Terraria',appid:'105600'},
+  {name:'Celeste',appid:'504230'},
+  {name:'Cuphead',appid:'268910'},
+  {name:'Dead by Daylight',appid:'381210'},
+];
+const RANDOM_IDS=['730','570','440','413150','1145360','367520','105600','504230','268910','381210'];
+
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-link')[['home','download','discover','appids'].indexOf(name)].classList.add('active');
+}
+
+// Popüler grid
+(function(){
+  const g=document.getElementById('popular-grid');
+  g.innerHTML=POPULAR.map(p=>`
+    <div class="game-tile" onclick="goDownload('${p.appid}')">
+      <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${p.appid}/capsule_231x87.jpg" onerror="this.style.display='none'">
+      <div class="gt-info">
+        <div class="gt-name">${p.name}</div>
+        <div class="gt-id">App ID: ${p.appid}</div>
+        <div class="gt-arrow"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+    </div>`).join('');
+})();
+
+function goDownload(appid){
+  showPage('download');
+  document.getElementById('appid-input').value=appid;
+  searchById();
+}
+
+function heroSearch(){
+  const v=document.getElementById('hero-search').value.trim();
+  if(!v)return;
+  showPage('download');
+  if(/^\d+$/.test(v)){document.getElementById('appid-input').value=v;searchById();}
+  else{document.getElementById('name-search').value=v;searchByName();}
+}
+
+// Autocomplete
+let acTimer=null;
+function onNameInput(){
+  const v=document.getElementById('name-search').value.trim();
+  clearTimeout(acTimer);
+  if(v.length<2){hideAc('ac-list');return;}
+  acTimer=setTimeout(()=>fetchAc(v,'ac-list',id=>{document.getElementById('appid-input').value=id;searchById();}),400);
+}
+function onDiscInput(){
+  const v=document.getElementById('disc-search').value.trim();
+  clearTimeout(acTimer);
+  if(v.length<2){hideAc('disc-ac-list');return;}
+  acTimer=setTimeout(()=>fetchAc(v,'disc-ac-list',id=>discSearch(id)),400);
+}
+async function fetchAc(q,listId,onSelect){
+  try{
+    const r=await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+    const data=await r.json();
+    const list=document.getElementById(listId);
+    if(!data.length){list.style.display='none';return;}
+    list.style.display='block';
+    list.innerHTML=data.slice(0,8).map(g=>`
+      <div class="ac-item" onclick="selectAc('${listId}','${g.name.replace(/'/g,"\\'")}','${g.appid}')">
+        <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/capsule_231x87.jpg" onerror="this.style.display='none'">
+        <span>${g.name}</span><small>${g.appid}</small>
+      </div>`).join('');
+    list._cb=onSelect;
+  }catch(e){hideAc(listId);}
+}
+function selectAc(listId,name,appid){
+  hideAc(listId);
+  const inp=listId==='ac-list'?'name-search':'disc-search';
+  document.getElementById(inp).value=name;
+  document.getElementById(listId)._cb?.(appid);
+  if(listId==='disc-ac-list')discSearch(appid);
+}
+function hideAc(id){document.getElementById(id).style.display='none';}
+document.addEventListener('click',e=>{if(!e.target.closest('.autocomplete-wrap')){hideAc('ac-list');hideAc('disc-ac-list');}});
+
+// İndirme
+async function searchByName(){
+  const q=document.getElementById('name-search').value.trim();
+  if(!q)return;hideAc('ac-list');
+  try{const r=await fetch(`/api/search?q=${encodeURIComponent(q)}`);const d=await r.json();
+    if(!d.length)return setErr('dl','Oyun bulunamadı.');
+    document.getElementById('appid-input').value=d[0].appid;searchById();
+  }catch(e){setErr('dl',e.message);}
+}
+async function searchById(){
+  const appid=document.getElementById('appid-input').value.trim();
+  if(!appid)return;
+  clearArea('dl');setLoader('dl',true);
+  try{
+    const[gRes,iRes]=await Promise.all([
+      fetch(`/api/game/${appid}`).then(r=>r.json()),
+      fetch(`/api/items/${appid}`).then(r=>r.json())
+    ]);
+    if(gRes.error)throw new Error(gRes.error);
+    if(!iRes.items?.length){showBar('dl',gRes,0,[]);throw new Error('Bu oyun için puan dükkanı öğesi bulunamadı.');}
+    showBar('dl',gRes,iRes.total,iRes.items);
+    renderGrid(iRes.items,appid,'dl-results',gRes.name);
+  }catch(e){setErr('dl',e.message);}
+  setLoader('dl',false);
+}
+
+// Keşfet
+async function discSearchByName(){
+  const q=document.getElementById('disc-search').value.trim();
+  if(!q)return;hideAc('disc-ac-list');
+  try{const r=await fetch(`/api/search?q=${encodeURIComponent(q)}`);const d=await r.json();
+    if(!d.length)return setErr('disc','Oyun bulunamadı.');
+    discSearch(d[0].appid);
+  }catch(e){setErr('disc',e.message);}
+}
+function randomGame(){discSearch(RANDOM_IDS[Math.floor(Math.random()*RANDOM_IDS.length)]);}
+async function discSearch(appid){
+  clearArea('disc');setLoader('disc',true);
+  try{
+    const[gRes,iRes]=await Promise.all([
+      fetch(`/api/game/${appid}`).then(r=>r.json()),
+      fetch(`/api/items/${appid}`).then(r=>r.json())
+    ]);
+    if(gRes.error)throw new Error(gRes.error);
+    if(!iRes.items?.length){showBar('disc',gRes,0,[]);throw new Error('Bu oyun için puan dükkanı öğesi bulunamadı.');}
+    showBar('disc',gRes,iRes.total,iRes.items);
+    renderGrid(iRes.items,appid,'disc-results',gRes.name);
+  }catch(e){setErr('disc',e.message);}
+  setLoader('disc',false);
+}
+
+// Ortak render
+async function showBar(prefix, g, total, items) {
+  const favActive = isFav(g.appid) ? 'active' : '';
+
+  // İstatistikler
+  const typeCounts = {};
+  const colors = ['#3b9eff','#a78bfa','#4ade80','#fbbf24','#f87171','#34d399','#fb923c'];
+  items.forEach(i => typeCounts[i.type] = (typeCounts[i.type]||0) + 1);
+  const statsHTML = Object.entries(typeCounts).map(([type, count], idx) =>
+    `<div class="stat-item"><div class="stat-dot" style="background:${colors[idx%colors.length]}"></div><span>${type}:</span><strong>${count}</strong></div>`
+  ).join('');
+
+  // Oyun detayı
+  let detailHTML = '';
+  try {
+    const d = await fetch(`/api/gamedetail/${g.appid}`).then(r=>r.json());
+    if (d && !d.error) {
+      const price = d.price || 'Ücretsiz';
+      const score = d.score ? `${d.score}% Olumlu` : null;
+      const date = d.releaseDate || '';
+      const dev = d.developer || '';
+      detailHTML = `
+        <div class="game-detail">
+          <img class="game-detail-img" src="${g.img}" onerror="this.style.display='none'">
+          <div class="game-detail-info">
+            <div class="game-detail-name">${g.name}</div>
+            <div class="game-detail-meta">
+              <span class="meta-chip blue">💰 ${price}</span>
+              ${score ? `<span class="meta-chip green">👍 ${score}</span>` : ''}
+              ${date ? `<span class="meta-chip">📅 ${date}</span>` : ''}
+              ${dev ? `<span class="meta-chip">🏢 ${dev}</span>` : ''}
+              <span class="meta-chip yellow">🎁 ${total} öğe</span>
+            </div>
+          </div>
+        </div>`;
+    }
+  } catch(e) {}
+
+  document.getElementById(prefix+'-game-info').innerHTML = `
+    ${detailHTML}
+    <div class="game-bar">
+      <div style="flex:1"><strong>${g.name}</strong><br><span>App ID: ${g.appid}</span></div>
+      <button class="fav-btn fav-star ${favActive}" data-appid="${g.appid}" onclick="toggleFav('${g.appid}','${g.name.replace(/'/g,"\\'")}')">
+        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </button>
+    </div>
+    <div class="stats-bar">${statsHTML}</div>`;
+}
+let currentItems = [], currentAppid = '', currentGameName = '';
+
+function renderGrid(items, appid, containerId, gameName='') {
+  currentItems = items;
+  currentAppid = appid;
+  currentGameName = gameName;
+  let activeType = 'Tümü';
+  showAnimOnly = false;
+  const types = ['Tümü', ...new Set(items.map(i=>i.type))];
+  const el = document.getElementById(containerId);
+  const render = () => {
+    let filtered = activeType === 'Tümü' ? items : items.filter(i=>i.type===activeType);
+    if (showAnimOnly) filtered = filtered.filter(i => i.videoUrl);
+    currentItems = filtered;
+    const gridClass = gridSize === 'medium' ? '' : gridSize;
+    el.innerHTML = `
+      <div class="filters">
+        ${types.map(t=>`<button class="fbtn ${t===activeType?'active':''}" data-type="${t}">${t} (${t==='Tümü'?items.length:items.filter(i=>i.type===t).length})</button>`).join('')}
+        <span class="counter">${filtered.length} öğe</span>
+        <button class="anim-toggle ${showAnimOnly?'active':''}" onclick="showAnimOnly=!showAnimOnly;renderCurrent()">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          ${showAnimOnly ? 'Tümünü Göster' : 'Sadece Animasyonlu'}
+        </button>
+        ${gridToggleHTML()}
+        <button class="btn btn-green btn-sm" id="dla" onclick="triggerZipDownload()">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Tümünü İndir (ZIP)
+        </button>
+      </div>
+      <div class="grid ${gridClass}">
+        ${filtered.map(it => {
+          const url = it.videoUrl||it.imgUrl||'';
+          const ext = url.split('.').pop().split('?')[0];
+          const fname = `${appid}_${it.name.replace(/[^a-z0-9]/gi,'_')}.${ext}`;
+          const itJson = JSON.stringify(it).replace(/"/g,'&quot;');
+          return `<div class="card">
+            <div class="thumb" onclick="openPreview(${itJson},'${appid}')" style="cursor:pointer">
+              ${it.videoUrl?`<video src="${it.videoUrl}" autoplay loop muted playsinline></video>`
+                :it.imgUrl?`<img src="${it.imgUrl}" loading="lazy" onerror="this.style.opacity='.15'">`
+                :`<span style="font-size:2rem">📦</span>`}
+              <span class="type-badge">${it.type}</span>
+              ${it.videoUrl?`<span class="type-badge" style="top:6px;left:6px;right:auto;color:#a78bfa;border-color:rgba(167,139,250,.3)">▶ Animasyon</span>`:''}
+            </div>
+            <div class="meta">
+              <div class="cname" title="${it.name}">${it.name}</div>
+              <div class="ctype">${it.type}</div>
+              ${url?`<button class="dl" onclick="dlFile('${url}','${fname}')">
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                İndir
+              </button>`:`<button class="dl" disabled style="opacity:.3">Yok</button>`}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    el.querySelectorAll('.fbtn').forEach(b => b.onclick = () => { activeType = b.dataset.type; render(); });
+    document.querySelectorAll('.gt-btn').forEach((b,i) => {
+      b.onclick = () => setGridSize(['small','medium','large'][i]);
+    });
+  };
+  window.renderCurrent = render;
+  render();
+}
+
+function triggerZipDownload() {
+  dlAll(currentItems, currentAppid, currentGameName);
+}
+async function dlAll(items,appid){
+  const list=items.filter(i=>i.videoUrl||i.imgUrl);
+  if(!confirm(`${list.length} öğe indirilecek. Devam?`))return;
+  for(const it of list){
+    const url=it.videoUrl||it.imgUrl;
+    const ext=url.split('.').pop().split('?')[0];
+    dlFile(url,`${appid}_${it.name.replace(/[^a-z0-9]/gi,'_')}.${ext}`);
+    await new Promise(r=>setTimeout(r,400));
+  }
+}
+function dlFile(url,fname){
+  const a=document.createElement('a');
+  a.href=`/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(fname)}`;
+  a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+// ===== KLAVYE KISAYOLLARI =====
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && !['INPUT','TEXTAREA'].includes(e.target.tagName)) {
+    e.preventDefault();
+    const activePage = document.querySelector('.page.active').id;
+    const inputMap = {'page-download':'name-search','page-discover':'disc-search','page-appids':'appid-guide-search','page-home':'hero-search'};
+    const inp = document.getElementById(inputMap[activePage]);
+    if (inp) inp.focus();
+  }
+  if (e.key === 'Escape') closePreview();
+});
+
+// ===== GRİD BOYUTU =====
+let gridSize = 'medium';
+function setGridSize(size) {
+  gridSize = size;
+  document.querySelectorAll('.grid').forEach(g => {
+    g.classList.remove('small','large');
+    if (size !== 'medium') g.classList.add(size);
+  });
+  document.querySelectorAll('.gt-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['small','medium','large'][i] === size);
+  });
+}
+
+function gridToggleHTML() {
+  return `<div class="grid-toggle">
+    <button class="gt-btn ${gridSize==='small'?'active':''}" onclick="setGridSize('small')" title="Küçük">
+      <svg viewBox="0 0 24 24"><path d="M3 3h4v4H3zm7 0h4v4h-4zm7 0h4v4h-4zM3 10h4v4H3zm7 0h4v4h-4zm7 0h4v4h-4zM3 17h4v4H3zm7 0h4v4h-4zm7 0h4v4h-4z"/></svg>
+    </button>
+    <button class="gt-btn ${gridSize==='medium'?'active':''}" onclick="setGridSize('medium')" title="Orta">
+      <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
+    </button>
+    <button class="gt-btn ${gridSize==='large'?'active':''}" onclick="setGridSize('large')" title="Büyük">
+      <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/></svg>
+    </button>
+  </div>`;
+}
+
+// ===== ANİMASYON FİLTRE =====
+let showAnimOnly = false;
+
+// ===== OYUN BİLGİSİ PANELİ =====
+async function fetchGameDetail(appid) {
+  try {
+    const r = await fetch(`/api/gamedetail/${appid}`);
+    return await r.json();
+  } catch(e) { return null; }
+}
+
+// ===== FAVORİLER =====
+let favs = JSON.parse(localStorage.getItem('steamdl_favs') || '[]');
+function saveFavs() { localStorage.setItem('steamdl_favs', JSON.stringify(favs)); }
+function isFav(appid) { return favs.some(f => f.appid === appid); }
+function toggleFav(appid, name) {
+  if (isFav(appid)) favs = favs.filter(f => f.appid !== appid);
+  else favs.push({ appid, name });
+  saveFavs(); renderFavs();
+  document.querySelectorAll(`.fav-star[data-appid="${appid}"]`).forEach(b => {
+    b.classList.toggle('active', isFav(appid));
+  });
+}
+function renderFavs() {
+  const el = document.getElementById('fav-games');
+  if (!el) return;
+  if (!favs.length) { el.innerHTML = '<span class="no-favs">Henüz favori oyun eklemediniz. Bir oyun ararken ⭐ ikonuna tıklayın.</span>'; return; }
+  el.innerHTML = favs.map(f => `
+    <div class="fav-game-chip" onclick="goDownload('${f.appid}')">
+      <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${f.appid}/capsule_231x87.jpg" onerror="this.style.display='none'">
+      ${f.name}
+      <span class="rm" onclick="event.stopPropagation();toggleFav('${f.appid}','${f.name}')">✕</span>
+    </div>`).join('');
+}
+renderFavs();
+
+// ===== ÖNİZLEME MODAL =====
+function openPreview(item, appid) {
+  const ext = (item.videoUrl||item.imgUrl||'').split('.').pop().split('?')[0];
+  const fname = `${appid}_${item.name.replace(/[^a-z0-9]/gi,'_')}.${ext}`;
+  document.getElementById('modal-name').textContent = item.name;
+  document.getElementById('modal-type').textContent = item.type;
+  document.getElementById('modal-preview').innerHTML = item.videoUrl
+    ? `<video src="${item.videoUrl}" autoplay loop muted playsinline style="max-width:100%;max-height:100%"></video>`
+    : `<img src="${item.imgUrl}" style="max-width:100%;max-height:100%;object-fit:contain">`;
+  document.getElementById('modal-dl-btn').onclick = () => dlFile(item.videoUrl||item.imgUrl, fname);
+  document.getElementById('preview-modal').classList.add('open');
+}
+function closePreview() { document.getElementById('preview-modal').classList.remove('open'); }
+function closeModal(e) { if (e.target.id === 'preview-modal') closePreview(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+
+// Helpers
+function clearArea(p){['error','game-info','results'].forEach(s=>document.getElementById(p+'-'+s).innerHTML='');}
+function setErr(p,msg){document.getElementById(p+'-error').innerHTML=`<div class="error-box"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>${msg}</div>`;}
+function setLoader(p,v){document.getElementById(p+'-loader').style.display=v?'block':'none';}
+</script>
+</body>
+</html>
