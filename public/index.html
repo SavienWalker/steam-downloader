@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>SteamDL — Puan Dükkanı İndirici</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -226,6 +227,18 @@ input::placeholder{color:var(--muted)}
 /* KLAVYE KISAYOL İPUCU */
 .kbd{display:inline-flex;align-items:center;background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:5px;padding:1px 6px;font-size:.7rem;color:var(--muted);font-family:monospace;margin-left:4px}
 
+/* LANGUAGE SELECTOR */
+.lang-select{position:relative;margin-left:auto}
+.lang-btn{background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:.2s;font-family:'Inter',sans-serif}
+.lang-btn:hover{background:rgba(255,255,255,.08);border-color:var(--blue)}
+.lang-btn .arrow{font-size:.65rem;opacity:.6}
+.lang-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:4px;min-width:160px;box-shadow:0 20px 40px rgba(0,0,0,.5);display:none;z-index:300}
+.lang-dropdown.open{display:block}
+.lang-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;border-radius:7px;font-size:.85rem;color:var(--text);transition:.15s}
+.lang-item:hover{background:rgba(59,158,255,.1)}
+.lang-item.active{background:rgba(59,158,255,.15);color:var(--blue)}
+.lang-flag{font-size:1.1rem}
+
 /* Scrollbar */
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -262,20 +275,34 @@ input::placeholder{color:var(--muted)}
   <div class="nav-links">
     <button class="nav-link active" onclick="showPage('home')">
       <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      Anasayfa
+      <span data-i18n="nav_home">Anasayfa</span>
     </button>
     <button class="nav-link" onclick="showPage('download')">
       <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      İndir
+      <span data-i18n="nav_download">İndir</span>
     </button>
     <button class="nav-link" onclick="showPage('discover')">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-      Keşfet
+      <span data-i18n="nav_discover">Keşfet</span>
     </button>
     <button class="nav-link" onclick="showPage('appids')">
       <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
-      App ID Rehberi
+      <span data-i18n="nav_appids">App ID Rehberi</span>
     </button>
+  </div>
+  <div class="lang-select">
+    <button class="lang-btn" onclick="toggleLangDropdown()">
+      <span id="lang-btn-content"><span class="lang-flag">🇹🇷</span> TÜR</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="lang-dropdown" id="lang-dropdown">
+      <div class="lang-item" onclick="setLang('tr')"><span class="lang-flag">🇹🇷</span> Türkçe</div>
+      <div class="lang-item" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span> English</div>
+      <div class="lang-item" onclick="setLang('de')"><span class="lang-flag">🇩🇪</span> Deutsch</div>
+      <div class="lang-item" onclick="setLang('ja')"><span class="lang-flag">🇯🇵</span> 日本語</div>
+      <div class="lang-item" onclick="setLang('es')"><span class="lang-flag">🇪🇸</span> Español</div>
+      <div class="lang-item" onclick="setLang('fr')"><span class="lang-flag">🇫🇷</span> Français</div>
+    </div>
   </div>
 </nav>
 
@@ -284,21 +311,21 @@ input::placeholder{color:var(--muted)}
   <div class="hero">
     <div class="hero-tag">
       <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Steam Puan Dükkanı İndirici
+      <span data-i18n="hero_tag">Steam Puan Dükkanı İndirici</span>
     </div>
-    <h1>Puan Dükkanı Öğelerini<br><span class="grad">Ücretsiz İndir</span></h1>
-    <p>Favori oyunlarının arka planlarını, emoticonlarını, avatar çerçevelerini ve animasyonlu öğelerini saniyeler içinde indir.</p>
+    <h1><span data-i18n="hero_title1">Puan Dükkanı Öğelerini</span><br><span class="grad" data-i18n="hero_title2">Ücretsiz İndir</span></h1>
+    <p data-i18n="hero_desc">Favori oyunlarının arka planlarını, emoticonlarını, avatar çerçevelerini ve animasyonlu öğelerini saniyeler içinde indir.</p>
     <div class="hero-search">
-      <input type="text" id="hero-search" placeholder="Oyun adı veya App ID ara..." onkeydown="if(event.key==='Enter')heroSearch()">
+      <input type="text" id="hero-search" data-i18n-ph="hero_search" placeholder="Oyun adı veya App ID ara..." onkeydown="if(event.key==='Enter')heroSearch()">
       <button class="btn" onclick="heroSearch()">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        Ara
+        <span data-i18n="search">Ara</span>
       </button>
     </div>
     <div class="stats-row">
-      <div class="stat"><div class="stat-num">10+</div><div class="stat-label">Popüler Oyun</div></div>
-      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">İndirilebilir Öğe</div></div>
-      <div class="stat"><div class="stat-num">%100</div><div class="stat-label">Ücretsiz</div></div>
+      <div class="stat"><div class="stat-num">10+</div><div class="stat-label" data-i18n="stat1">Popüler Oyun</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label" data-i18n="stat2">İndirilebilir Öğe</div></div>
+      <div class="stat"><div class="stat-num">%100</div><div class="stat-label" data-i18n="stat3">Ücretsiz</div></div>
     </div>
   </div>
 
@@ -306,7 +333,7 @@ input::placeholder{color:var(--muted)}
     <div class="section-header">
       <div class="section-title">
         <svg viewBox="0 0 24 24"><path d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/></svg>
-        Popüler Oyunlar
+        <span data-i18n="popular_games">Popüler Oyunlar</span>
       </div>
     </div>
     <div class="popular-grid" id="popular-grid"></div>
@@ -556,6 +583,7 @@ function getCatIcon(cat) {
 function setGuideCat(cat) {
   activeGuidecat = cat;
   buildAppIdPage();
+applyLang();
 }
 
 function copyId(btn, appid) {
@@ -623,6 +651,196 @@ const POPULAR=[
   {name:'Dead by Daylight',appid:'381210'},
 ];
 const RANDOM_IDS=['730','570','440','413150','1145360','367520','105600','504230','268910','381210'];
+
+// ===== DİL ÇEVİRİ SİSTEMİ =====
+const I18N = {
+  tr: {
+    nav_home:'Anasayfa', nav_download:'İndir', nav_discover:'Keşfet', nav_appids:'App ID Rehberi',
+    hero_tag:'Steam Puan Dükkanı İndirici',
+    hero_title1:'Puan Dükkanı Öğelerini', hero_title2:'Ücretsiz İndir',
+    hero_desc:'Favori oyunlarının arka planlarını, emoticonlarını, avatar çerçevelerini ve animasyonlu öğelerini saniyeler içinde indir.',
+    hero_search:'Oyun adı veya App ID ara...', search:'Ara',
+    stat1:'Popüler Oyun', stat2:'İndirilebilir Öğe', stat3:'Ücretsiz',
+    popular_games:'Popüler Oyunlar',
+    dl_title:'Öğe İndir', dl_by_name:'Oyun Adıyla Ara', dl_by_name_ph:'Örn: Counter-Strike, Stardew Valley...',
+    dl_or_appid:'veya App ID ile', dl_appid_ph:'730 = CS2 · 570 = Dota 2 · 440 = TF2',
+    dl_hint:'store.steampowered.com/app/',
+    disc_title:'Keşfet', disc_by_name:'Oyun Adıyla Keşfet', disc_ph:'Oyun adı yaz...',
+    random:'Rastgele Oyun', random_desc:'Sürpriz bir oyunun öğelerini keşfet!',
+    appids_title:'App ID Rehberi', appids_search:'Oyun Adıyla App ID Bul', appids_ph:'Oyun adı yaz, App ID\'sini bul...',
+    fav_title:'Favori Oyunlarım', fav_empty:'Henüz favori oyun eklemediniz. Bir oyun ararken ⭐ ikonuna tıklayın.',
+    download:'İndir', download_all:'Tümünü İndir (ZIP)', download_all_confirm:'öğe ZIP olarak indirilecek. Devam?',
+    preparing:'Hazırlanıyor...', only_anim:'Sadece Animasyonlu', show_all:'Tümünü Göster',
+    all:'Tümü', items:'öğe', items_found:'öğe bulundu', no_items:'Bu oyun için puan dükkanı öğesi bulunamadı.',
+    loading_items:'Öğeler yükleniyor… (15–30 sn sürebilir)', loading:'Yükleniyor…',
+    copy:'Kopyala', copied:'Kopyalandı', not_found:'Oyun bulunamadı.', game_not_found:'Oyun bulunamadı',
+    cat_free:'Ücretsiz', cat_action:'Aksiyon', cat_rpg:'RPG', cat_strategy:'Strateji', cat_horror:'Korku', cat_indie:'Platform & Indie', cat_multi:'Çok Oyunculu',
+    search_result:'Arama Sonucu',
+  },
+  en: {
+    nav_home:'Home', nav_download:'Download', nav_discover:'Discover', nav_appids:'App ID Guide',
+    hero_tag:'Steam Points Shop Downloader',
+    hero_title1:'Download Points Shop', hero_title2:'Items for Free',
+    hero_desc:'Download backgrounds, emoticons, avatar frames, and animated items from your favorite games in seconds.',
+    hero_search:'Search game name or App ID...', search:'Search',
+    stat1:'Popular Games', stat2:'Downloadable Items', stat3:'Free',
+    popular_games:'Popular Games',
+    dl_title:'Download Item', dl_by_name:'Search by Game Name', dl_by_name_ph:'E.g.: Counter-Strike, Stardew Valley...',
+    dl_or_appid:'or by App ID', dl_appid_ph:'730 = CS2 · 570 = Dota 2 · 440 = TF2',
+    dl_hint:'store.steampowered.com/app/',
+    disc_title:'Discover', disc_by_name:'Discover by Name', disc_ph:'Type a game name...',
+    random:'Random Game', random_desc:'Discover items from a surprise game!',
+    appids_title:'App ID Guide', appids_search:'Find App ID by Game Name', appids_ph:'Type game name to find App ID...',
+    fav_title:'My Favorite Games', fav_empty:'No favorites yet. Click ⭐ when searching a game.',
+    download:'Download', download_all:'Download All (ZIP)', download_all_confirm:'items will be downloaded as ZIP. Continue?',
+    preparing:'Preparing...', only_anim:'Only Animated', show_all:'Show All',
+    all:'All', items:'items', items_found:'items found', no_items:'No points shop items found for this game.',
+    loading_items:'Loading items… (may take 15–30s)', loading:'Loading…',
+    copy:'Copy', copied:'Copied', not_found:'Game not found.', game_not_found:'Game not found',
+    cat_free:'Free', cat_action:'Action', cat_rpg:'RPG', cat_strategy:'Strategy', cat_horror:'Horror', cat_indie:'Platform & Indie', cat_multi:'Multiplayer',
+    search_result:'Search Result',
+  },
+  de: {
+    nav_home:'Startseite', nav_download:'Herunterladen', nav_discover:'Entdecken', nav_appids:'App-ID-Leitfaden',
+    hero_tag:'Steam Punkte-Shop Downloader',
+    hero_title1:'Punkte-Shop-Inhalte', hero_title2:'Kostenlos Herunterladen',
+    hero_desc:'Lade Hintergründe, Emoticons, Avatar-Rahmen und animierte Inhalte deiner Lieblingsspiele in Sekunden herunter.',
+    hero_search:'Spielname oder App-ID suchen...', search:'Suchen',
+    stat1:'Beliebte Spiele', stat2:'Herunterladbare Inhalte', stat3:'Kostenlos',
+    popular_games:'Beliebte Spiele',
+    dl_title:'Inhalt herunterladen', dl_by_name:'Nach Spielname suchen', dl_by_name_ph:'Z.B.: Counter-Strike, Stardew Valley...',
+    dl_or_appid:'oder per App-ID', dl_appid_ph:'730 = CS2 · 570 = Dota 2 · 440 = TF2',
+    dl_hint:'store.steampowered.com/app/',
+    disc_title:'Entdecken', disc_by_name:'Nach Namen entdecken', disc_ph:'Spielnamen eingeben...',
+    random:'Zufälliges Spiel', random_desc:'Entdecke Inhalte eines Überraschungsspiels!',
+    appids_title:'App-ID-Leitfaden', appids_search:'App-ID nach Spielname finden', appids_ph:'Spielnamen eingeben, um App-ID zu finden...',
+    fav_title:'Meine Lieblingsspiele', fav_empty:'Noch keine Favoriten. Klicke ⭐ bei der Suche.',
+    download:'Herunterladen', download_all:'Alle herunterladen (ZIP)', download_all_confirm:'Inhalte werden als ZIP heruntergeladen. Fortfahren?',
+    preparing:'Wird vorbereitet...', only_anim:'Nur animiert', show_all:'Alle anzeigen',
+    all:'Alle', items:'Inhalte', items_found:'Inhalte gefunden', no_items:'Keine Punkte-Shop-Inhalte für dieses Spiel gefunden.',
+    loading_items:'Inhalte werden geladen… (kann 15–30s dauern)', loading:'Wird geladen…',
+    copy:'Kopieren', copied:'Kopiert', not_found:'Spiel nicht gefunden.', game_not_found:'Spiel nicht gefunden',
+    cat_free:'Kostenlos', cat_action:'Action', cat_rpg:'RPG', cat_strategy:'Strategie', cat_horror:'Horror', cat_indie:'Platform & Indie', cat_multi:'Mehrspieler',
+    search_result:'Suchergebnis',
+  },
+  ja: {
+    nav_home:'ホーム', nav_download:'ダウンロード', nav_discover:'発見', nav_appids:'App ID ガイド',
+    hero_tag:'Steam ポイントショップダウンローダー',
+    hero_title1:'ポイントショップの', hero_title2:'アイテムを無料でダウンロード',
+    hero_desc:'お気に入りのゲームの背景、絵文字、アバターフレーム、アニメーションアイテムを数秒でダウンロード。',
+    hero_search:'ゲーム名または App ID を検索...', search:'検索',
+    stat1:'人気ゲーム', stat2:'ダウンロード可能', stat3:'無料',
+    popular_games:'人気のゲーム',
+    dl_title:'アイテムダウンロード', dl_by_name:'ゲーム名で検索', dl_by_name_ph:'例: Counter-Strike, Stardew Valley...',
+    dl_or_appid:'または App ID で', dl_appid_ph:'730 = CS2 · 570 = Dota 2 · 440 = TF2',
+    dl_hint:'store.steampowered.com/app/',
+    disc_title:'発見', disc_by_name:'名前で発見', disc_ph:'ゲーム名を入力...',
+    random:'ランダムゲーム', random_desc:'サプライズゲームのアイテムを発見！',
+    appids_title:'App ID ガイド', appids_search:'ゲーム名で App ID を検索', appids_ph:'ゲーム名を入力して App ID を検索...',
+    fav_title:'お気に入りのゲーム', fav_empty:'まだお気に入りがありません。検索時に ⭐ をクリック。',
+    download:'ダウンロード', download_all:'すべてダウンロード (ZIP)', download_all_confirm:'個のアイテムを ZIP でダウンロードします。続行？',
+    preparing:'準備中...', only_anim:'アニメのみ', show_all:'すべて表示',
+    all:'すべて', items:'アイテム', items_found:'個見つかりました', no_items:'このゲームのポイントショップアイテムが見つかりません。',
+    loading_items:'読み込み中… (15〜30秒)', loading:'読み込み中…',
+    copy:'コピー', copied:'コピー済み', not_found:'ゲームが見つかりません。', game_not_found:'ゲームが見つかりません',
+    cat_free:'無料', cat_action:'アクション', cat_rpg:'RPG', cat_strategy:'ストラテジー', cat_horror:'ホラー', cat_indie:'プラットフォーム・インディー', cat_multi:'マルチプレイヤー',
+    search_result:'検索結果',
+  },
+  es: {
+    nav_home:'Inicio', nav_download:'Descargar', nav_discover:'Descubrir', nav_appids:'Guía App ID',
+    hero_tag:'Descargador de Tienda de Puntos Steam',
+    hero_title1:'Descarga los Artículos', hero_title2:'de la Tienda de Puntos Gratis',
+    hero_desc:'Descarga fondos, emoticonos, marcos de avatar y elementos animados de tus juegos favoritos en segundos.',
+    hero_search:'Buscar nombre de juego o App ID...', search:'Buscar',
+    stat1:'Juegos Populares', stat2:'Artículos Descargables', stat3:'Gratis',
+    popular_games:'Juegos Populares',
+    dl_title:'Descargar Artículo', dl_by_name:'Buscar por Nombre', dl_by_name_ph:'Ej: Counter-Strike, Stardew Valley...',
+    dl_or_appid:'o por App ID', dl_appid_ph:'730 = CS2 · 570 = Dota 2 · 440 = TF2',
+    dl_hint:'store.steampowered.com/app/',
+    disc_title:'Descubrir', disc_by_name:'Descubrir por Nombre', disc_ph:'Escribe el nombre del juego...',
+    random:'Juego Aleatorio', random_desc:'¡Descubre artículos de un juego sorpresa!',
+    appids_title:'Guía App ID', appids_search:'Buscar App ID por Nombre', appids_ph:'Escribe el nombre para encontrar el App ID...',
+    fav_title:'Mis Juegos Favoritos', fav_empty:'Aún no hay favoritos. Haz clic en ⭐ al buscar.',
+    download:'Descargar', download_all:'Descargar Todo (ZIP)', download_all_confirm:'artículos se descargarán como ZIP. ¿Continuar?',
+    preparing:'Preparando...', only_anim:'Solo Animados', show_all:'Mostrar Todo',
+    all:'Todos', items:'artículos', items_found:'artículos encontrados', no_items:'No se encontraron artículos para este juego.',
+    loading_items:'Cargando artículos… (puede tardar 15–30s)', loading:'Cargando…',
+    copy:'Copiar', copied:'Copiado', not_found:'Juego no encontrado.', game_not_found:'Juego no encontrado',
+    cat_free:'Gratis', cat_action:'Acción', cat_rpg:'RPG', cat_strategy:'Estrategia', cat_horror:'Terror', cat_indie:'Plataforma & Indie', cat_multi:'Multijugador',
+    search_result:'Resultado de Búsqueda',
+  },
+  fr: {
+    nav_home:'Accueil', nav_download:'Télécharger', nav_discover:'Découvrir', nav_appids:'Guide App ID',
+    hero_tag:'Téléchargeur Boutique Points Steam',
+    hero_title1:'Téléchargez les Articles', hero_title2:'de la Boutique Points Gratuitement',
+    hero_desc:'Téléchargez les arrière-plans, émoticônes, cadres d\'avatar et éléments animés de vos jeux préférés en quelques secondes.',
+    hero_search:'Rechercher un jeu ou App ID...', search:'Rechercher',
+    stat1:'Jeux Populaires', stat2:'Articles Téléchargeables', stat3:'Gratuit',
+    popular_games:'Jeux Populaires',
+    dl_title:'Télécharger un Article', dl_by_name:'Rechercher par Nom', dl_by_name_ph:'Ex: Counter-Strike, Stardew Valley...',
+    dl_or_appid:'ou par App ID', dl_appid_ph:'730 = CS2 · 570 = Dota 2 · 440 = TF2',
+    dl_hint:'store.steampowered.com/app/',
+    disc_title:'Découvrir', disc_by_name:'Découvrir par Nom', disc_ph:'Tapez le nom d\'un jeu...',
+    random:'Jeu Aléatoire', random_desc:'Découvrez les articles d\'un jeu surprise !',
+    appids_title:'Guide App ID', appids_search:'Trouver App ID par Nom', appids_ph:'Tapez le nom pour trouver l\'App ID...',
+    fav_title:'Mes Jeux Favoris', fav_empty:'Aucun favori. Cliquez sur ⭐ lors de la recherche.',
+    download:'Télécharger', download_all:'Tout Télécharger (ZIP)', download_all_confirm:'articles seront téléchargés en ZIP. Continuer ?',
+    preparing:'Préparation...', only_anim:'Animés Uniquement', show_all:'Tout Afficher',
+    all:'Tous', items:'articles', items_found:'articles trouvés', no_items:'Aucun article trouvé pour ce jeu.',
+    loading_items:'Chargement… (15–30s)', loading:'Chargement…',
+    copy:'Copier', copied:'Copié', not_found:'Jeu non trouvé.', game_not_found:'Jeu non trouvé',
+    cat_free:'Gratuit', cat_action:'Action', cat_rpg:'RPG', cat_strategy:'Stratégie', cat_horror:'Horreur', cat_indie:'Plateforme & Indie', cat_multi:'Multijoueur',
+    search_result:'Résultat de Recherche',
+  },
+};
+
+const LANGS = [
+  {code:'tr', flag:'🇹🇷', name:'Türkçe'},
+  {code:'en', flag:'🇬🇧', name:'English'},
+  {code:'de', flag:'🇩🇪', name:'Deutsch'},
+  {code:'ja', flag:'🇯🇵', name:'日本語'},
+  {code:'es', flag:'🇪🇸', name:'Español'},
+  {code:'fr', flag:'🇫🇷', name:'Français'},
+];
+
+let currentLang = localStorage.getItem('steamdl_lang') || 'tr';
+function t(key) { return I18N[currentLang]?.[key] || I18N.tr[key] || key; }
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = t(el.dataset.i18nPh);
+  });
+  document.documentElement.lang = currentLang;
+  updateLangBtn();
+  if (typeof buildAppIdPage === 'function') buildAppIdPage();
+  if (typeof renderFavs === 'function') renderFavs();
+}
+
+function updateLangBtn() {
+  const lang = LANGS.find(l => l.code === currentLang);
+  const btn = document.getElementById('lang-btn-content');
+  if (btn) btn.innerHTML = `<span class="lang-flag">${lang.flag}</span> ${lang.name.substring(0,3).toUpperCase()}`;
+}
+
+function setLang(code) {
+  currentLang = code;
+  localStorage.setItem('steamdl_lang', code);
+  document.getElementById('lang-dropdown').classList.remove('open');
+  applyLang();
+}
+
+function toggleLangDropdown() {
+  document.getElementById('lang-dropdown').classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.lang-select')) {
+    document.getElementById('lang-dropdown')?.classList.remove('open');
+  }
+});
 
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
