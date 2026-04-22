@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://steam-downloader-production.up.railway.app/sitemap.xml

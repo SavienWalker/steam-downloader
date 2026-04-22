@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0f1a"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b9eff"/>
+      <stop offset="100%" stop-color="#6644ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#3b9eff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3b9eff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Glow effects -->
+  <circle cx="150" cy="150" r="400" fill="url(#glow)"/>
+  <circle cx="1050" cy="500" r="350" fill="url(#glow)" opacity="0.6"/>
+
+  <!-- Logo icon -->
+  <rect x="80" y="80" width="90" height="90" rx="20" fill="url(#brand)"/>
+  <g transform="translate(100 100)">
+    <path d="M25 5a20 20 0 0 0-19.9 18h.1a10 10 0 0 1 10-10 10 10 0 0 1 10 10h.1A20 20 0 0 0 25 5zM5 25a20 20 0 0 0 20 20 20 20 0 0 0 20-20H5zm20 12a12 12 0 0 1-10.4-6l5.4 2.2a4 4 0 0 0 5-2 4 4 0 0 0-2-5.4l-5.6-2.2A12 12 0 0 1 25 37z" fill="#fff"/>
+  </g>
+
+  <!-- Brand name -->
+  <text x="200" y="140" font-family="Inter, sans-serif" font-size="54" font-weight="800" fill="#fff">Steam<tspan fill="#3b9eff">DL</tspan></text>
+
+  <!-- Main headline -->
+  <text x="80" y="280" font-family="Inter, sans-serif" font-size="72" font-weight="800" fill="#fff">Puan Dükkanı Öğelerini</text>
+  <text x="80" y="360" font-family="Inter, sans-serif" font-size="72" font-weight="800" fill="url(#brand)">Ücretsiz İndir</text>
+
+  <!-- Description -->
+  <text x="80" y="430" font-family="Inter, sans-serif" font-size="28" fill="#8ba3b8">Arka planlar · Emoticonlar · Çerçeveler · Animasyonlar</text>
+
+  <!-- Feature chips -->
+  <g transform="translate(80 490)">
+    <rect width="180" height="50" rx="25" fill="rgba(59,158,255,0.15)" stroke="#3b9eff" stroke-width="1"/>
+    <text x="90" y="32" font-family="Inter, sans-serif" font-size="20" font-weight="600" fill="#3b9eff" text-anchor="middle">🎮 10+ Oyun</text>
+  </g>
+  <g transform="translate(280 490)">
+    <rect width="200" height="50" rx="25" fill="rgba(74,222,128,0.15)" stroke="#4ade80" stroke-width="1"/>
+    <text x="100" y="32" font-family="Inter, sans-serif" font-size="20" font-weight="600" fill="#4ade80" text-anchor="middle">💰 %100 Ücretsiz</text>
+  </g>
+  <g transform="translate(500 490)">
+    <rect width="180" height="50" rx="25" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="1"/>
+    <text x="90" y="32" font-family="Inter, sans-serif" font-size="20" font-weight="600" fill="#fbbf24" text-anchor="middle">⚡ Hızlı</text>
+  </g>
+
+  <!-- URL -->
+  <text x="1120" y="600" font-family="Inter, sans-serif" font-size="20" fill="#5a7a9a" text-anchor="end">steam-downloader.up.railway.app</text>
+</svg>

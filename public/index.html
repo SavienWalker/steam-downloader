@@ -3,8 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SEO Meta Tags (Türkçe + İngilizce) -->
+<title>SteamDL — Steam Puan Dükkanı Öğelerini Ücretsiz İndir | Free Steam Points Shop Downloader</title>
+<meta name="description" content="Steam puan dükkanı öğelerini ücretsiz indir! Profil arka planları, animasyonlu çerçeveler, emoticonlar, avatarlar. Download free Steam Points Shop items: profile backgrounds, animated frames, emoticons. CS2, Dota 2, TF2 and more.">
+<meta name="keywords" content="steam puan dükkanı, steam points shop, steam arka plan indir, steam background download, steam emoticon, steam çerçeve, steam frame, animasyonlu arka plan, animated background, profil arka planı, profile background, steam öğe indir, free steam items, cs2 emoticon, dota 2 background, steam downloader, point shop downloader">
+<meta name="author" content="SteamDL">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://steam-downloader-production.up.railway.app/">
+
+<!-- Hreflang - Multi-language SEO -->
+<link rel="alternate" hreflang="tr" href="https://steam-downloader-production.up.railway.app/">
+<link rel="alternate" hreflang="en" href="https://steam-downloader-production.up.railway.app/">
+<link rel="alternate" hreflang="de" href="https://steam-downloader-production.up.railway.app/">
+<link rel="alternate" hreflang="ja" href="https://steam-downloader-production.up.railway.app/">
+<link rel="alternate" hreflang="es" href="https://steam-downloader-production.up.railway.app/">
+<link rel="alternate" hreflang="fr" href="https://steam-downloader-production.up.railway.app/">
+<link rel="alternate" hreflang="x-default" href="https://steam-downloader-production.up.railway.app/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://steam-downloader-production.up.railway.app/">
+<meta property="og:title" content="SteamDL — Steam Puan Dükkanı Öğelerini Ücretsiz İndir | Free Steam Points Shop Downloader">
+<meta property="og:description" content="Steam puan dükkanı öğelerini ücretsiz indir! Profil arka planları, emoticonlar, çerçeveler. Download free Steam Points Shop items: backgrounds, emoticons, frames.">
+<meta property="og:image" content="https://steam-downloader-production.up.railway.app/og-image.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="ja_JP">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:site_name" content="SteamDL">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://steam-downloader-production.up.railway.app/">
+<meta name="twitter:title" content="SteamDL — Free Steam Points Shop Downloader">
+<meta name="twitter:description" content="Download free Steam Points Shop items: backgrounds, emoticons, animated frames. Steam puan dükkanı öğelerini ücretsiz indir.">
+<meta name="twitter:image" content="https://steam-downloader-production.up.railway.app/og-image.svg">
+
+<!-- Tema Rengi -->
+<meta name="theme-color" content="#0a0f1a">
+<meta name="msapplication-TileColor" content="#0a0f1a">
+
+<!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>SteamDL — Puan Dükkanı İndirici</title>
+<link rel="apple-touch-icon" href="/favicon.svg">
+
+<!-- Structured Data (Schema.org) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "SteamDL",
+  "alternateName": "Steam Points Shop Downloader",
+  "url": "https://steam-downloader-production.up.railway.app/",
+  "description": "Download Steam Points Shop items for free: profile backgrounds, emoticons, animated frames, avatars. Steam puan dükkanı öğelerini ücretsiz indir.",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "inLanguage": ["tr", "en", "de", "ja", "es", "fr"],
+  "featureList": [
+    "Steam profile background download",
+    "Steam emoticon download",
+    "Steam animated frame download",
+    "Free Steam Points Shop items",
+    "Bulk ZIP download"
+  ]
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -806,6 +880,15 @@ const LANGS = [
 let currentLang = localStorage.getItem('steamdl_lang') || 'tr';
 function t(key) { return I18N[currentLang]?.[key] || I18N.tr[key] || key; }
 
+const TITLES = {
+  tr:'SteamDL — Steam Puan Dükkanı Öğelerini Ücretsiz İndir',
+  en:'SteamDL — Free Steam Points Shop Downloader',
+  de:'SteamDL — Steam Punkte-Shop Downloader Kostenlos',
+  ja:'SteamDL — Steam ポイントショップ無料ダウンローダー',
+  es:'SteamDL — Descargador Gratuito de Tienda de Puntos Steam',
+  fr:'SteamDL — Téléchargeur Gratuit Boutique Points Steam',
+};
+
 function applyLang() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
@@ -814,6 +897,7 @@ function applyLang() {
     el.placeholder = t(el.dataset.i18nPh);
   });
   document.documentElement.lang = currentLang;
+  document.title = TITLES[currentLang] || TITLES.tr;
   updateLangBtn();
   if (typeof buildAppIdPage === 'function') buildAppIdPage();
   if (typeof renderFavs === 'function') renderFavs();
