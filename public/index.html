@@ -410,7 +410,74 @@ input::placeholder{color:var(--muted)}
   .game-tile img{height:65px}
 }
 
-/* Scrollbar */
+/* ===== ZIP MODAL ===== */
+.zip-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:.25s}
+.zip-modal-overlay.open{opacity:1;pointer-events:all}
+.zip-modal{background:var(--card);border:1px solid var(--border2);border-radius:20px;max-width:400px;width:100%;padding:28px;text-align:center;transform:scale(.93);transition:.25s;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.zip-modal-overlay.open .zip-modal{transform:scale(1)}
+.zip-modal-icon{font-size:2.5rem;margin-bottom:12px}
+.zip-modal h3{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:8px}
+.zip-modal p{font-size:.85rem;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.zip-modal-btns{display:flex;gap:10px}
+.zip-modal-btns .btn{flex:1;justify-content:center}
+
+/* ===== KART ANİMASYONLARI ===== */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 rgba(59,158,255,0)}50%{box-shadow:0 0 20px 4px rgba(59,158,255,.2)}}
+@keyframes float-card{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+.card{animation:fadeInUp .4s ease both}
+.card:nth-child(1){animation-delay:.03s}
+.card:nth-child(2){animation-delay:.06s}
+.card:nth-child(3){animation-delay:.09s}
+.card:nth-child(4){animation-delay:.12s}
+.card:nth-child(5){animation-delay:.15s}
+.card:nth-child(6){animation-delay:.18s}
+.card:nth-child(7){animation-delay:.21s}
+.card:nth-child(8){animation-delay:.24s}
+.card:nth-child(9){animation-delay:.27s}
+.card:nth-child(10){animation-delay:.30s}
+.card:hover{border-color:var(--blue);transform:translateY(-6px) scale(1.02);box-shadow:0 16px 40px rgba(59,158,255,.18);animation:pulse-glow 2s ease infinite}
+.card .thumb{overflow:hidden}
+.card .thumb img,.card .thumb video{transition:transform .4s ease}
+.card:hover .thumb img,.card:hover .thumb video{transform:scale(1.08)}
+.card .dl{position:relative;overflow:hidden}
+.card .dl::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);transform:translateX(-100%);transition:.5s}
+.card:hover .dl::after{transform:translateX(100%)}
+
+/* Skeleton loader */
+.skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.skeleton-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;animation:fadeInUp .3s ease both}
+.skeleton-card:nth-child(n){animation-delay:calc(var(--i,.0) * .04s)}
+.skeleton-thumb{width:100%;aspect-ratio:1;background:linear-gradient(90deg,#111827 25%,#1a2535 50%,#111827 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.skeleton-meta{padding:10px}
+.skeleton-line{height:10px;border-radius:5px;background:linear-gradient(90deg,#111827 25%,#1a2535 50%,#111827 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;margin-bottom:8px}
+.skeleton-line.short{width:60%}
+.skeleton-btn{height:30px;border-radius:8px;background:linear-gradient(90deg,#111827 25%,#1a2535 50%,#111827 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+
+/* Oyun tile animasyonları */
+.game-tile{animation:fadeInUp .4s ease both}
+.game-tile:nth-child(1){animation-delay:.05s}
+.game-tile:nth-child(2){animation-delay:.1s}
+.game-tile:nth-child(3){animation-delay:.15s}
+.game-tile:nth-child(4){animation-delay:.2s}
+.game-tile:nth-child(5){animation-delay:.25s}
+.game-tile:nth-child(6){animation-delay:.3s}
+.game-tile:nth-child(7){animation-delay:.35s}
+.game-tile:nth-child(8){animation-delay:.4s}
+.game-tile:nth-child(9){animation-delay:.45s}
+.game-tile:nth-child(10){animation-delay:.5s}
+
+/* Progress bar (ZIP indirme) */
+.zip-progress{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:16px 0}
+.zip-progress-bar{height:100%;background:linear-gradient(90deg,var(--blue),#a78bfa);border-radius:3px;width:0%;transition:width .3s ease;position:relative}
+.zip-progress-bar::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shimmer 1s infinite}
+.zip-status{font-size:.8rem;color:var(--muted);text-align:center}
+
+/* Scroll reveal animasyonu */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
@@ -418,6 +485,26 @@ input::placeholder{color:var(--muted)}
 </style>
 </head>
 <body>
+
+<!-- ZIP MODAL -->
+<div class="zip-modal-overlay" id="zip-modal">
+  <div class="zip-modal">
+    <div class="zip-modal-icon">📦</div>
+    <h3 id="zip-modal-title">Tümünü İndir</h3>
+    <p id="zip-modal-desc">öğe ZIP olarak indirilecek.</p>
+    <div class="zip-progress" id="zip-progress" style="display:none">
+      <div class="zip-progress-bar" id="zip-progress-bar"></div>
+    </div>
+    <div class="zip-status" id="zip-status"></div>
+    <div class="zip-modal-btns" id="zip-modal-btns">
+      <button class="btn btn-ghost" onclick="closeZipModal()">İptal</button>
+      <button class="btn btn-green" id="zip-confirm-btn" onclick="confirmZipDownload()">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        İndir
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ÖNIZLEME MODAL -->
 <div class="modal-overlay" id="preview-modal" onclick="closeModal(event)">
@@ -1158,6 +1245,7 @@ async function searchById(){
   const appid=document.getElementById('appid-input').value.trim();
   if(!appid)return;
   clearArea('dl');setLoader('dl',true);
+  showSkeletonGrid('dl-results', 8);
   try{
     const[gRes,iRes]=await Promise.all([
       fetch(`/api/game/${appid}`).then(r=>r.json()),
@@ -1183,6 +1271,7 @@ async function discSearchByName(){
 function randomGame(){discSearch(RANDOM_IDS[Math.floor(Math.random()*RANDOM_IDS.length)]);}
 async function discSearch(appid){
   clearArea('disc');setLoader('disc',true);
+  showSkeletonGrid('disc-results', 8);
   try{
     const[gRes,iRes]=await Promise.all([
       fetch(`/api/game/${appid}`).then(r=>r.json()),
@@ -1374,6 +1463,109 @@ async function fetchGameDetail(appid) {
     const r = await fetch(`/api/gamedetail/${appid}`);
     return await r.json();
   } catch(e) { return null; }
+}
+
+// ===== ZIP MODAL =====
+let _zipItems = [], _zipAppid = '', _zipGameName = '';
+
+function triggerZipDownload() {
+  _zipItems = currentItems.filter(i => i.videoUrl || i.imgUrl);
+  _zipAppid = currentAppid;
+  _zipGameName = currentGameName;
+  if (!_zipItems.length) return;
+  document.getElementById('zip-modal-title').textContent = `${_zipGameName || _zipAppid} — ZIP İndir`;
+  document.getElementById('zip-modal-desc').textContent = `${_zipItems.length} öğe tek dosya olarak indirilecek.`;
+  document.getElementById('zip-progress').style.display = 'none';
+  document.getElementById('zip-status').textContent = '';
+  document.getElementById('zip-modal-btns').style.display = 'flex';
+  document.getElementById('zip-modal').classList.add('open');
+}
+
+function closeZipModal() {
+  document.getElementById('zip-modal').classList.remove('open');
+}
+
+async function confirmZipDownload() {
+  const btn = document.getElementById('zip-confirm-btn');
+  const btns = document.getElementById('zip-modal-btns');
+  const progress = document.getElementById('zip-progress');
+  const progressBar = document.getElementById('zip-progress-bar');
+  const status = document.getElementById('zip-status');
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Hazırlanıyor...';
+  progress.style.display = 'block';
+  status.textContent = 'Sunucuya istek gönderiliyor...';
+
+  // Sahte progress animasyonu
+  let pct = 0;
+  const timer = setInterval(() => {
+    pct = Math.min(pct + Math.random() * 8, 85);
+    progressBar.style.width = pct + '%';
+  }, 400);
+
+  try {
+    status.textContent = 'Öğeler paketleniyor...';
+    const r = await fetch('/api/zip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: _zipItems, appid: _zipAppid, gameName: _zipGameName })
+    });
+
+    clearInterval(timer);
+
+    if (!r.ok) throw new Error(`Sunucu hatası: ${r.status}`);
+
+    progressBar.style.width = '95%';
+    status.textContent = 'İndirme başlatılıyor...';
+
+    const blob = await r.blob();
+    progressBar.style.width = '100%';
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(_zipGameName||_zipAppid).replace(/[^a-z0-9]/gi,'_')}_assets.zip`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    status.textContent = '✅ İndirme başladı!';
+    btns.style.display = 'none';
+    setTimeout(() => closeZipModal(), 2000);
+
+  } catch(e) {
+    clearInterval(timer);
+    progressBar.style.width = '0%';
+    status.textContent = '❌ Hata: ' + e.message;
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Tekrar Dene';
+  }
+}
+
+// ===== SKELETON LOADER =====
+function showSkeletonGrid(containerId, count = 8) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `<div class="skeleton-grid">
+    ${Array(count).fill(0).map((_,i) => `
+      <div class="skeleton-card" style="--i:${i}">
+        <div class="skeleton-thumb"></div>
+        <div class="skeleton-meta">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-btn"></div>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ===== SCROLL REVEAL =====
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
+}, { threshold: 0.1 });
+
+function observeReveal() {
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 }
 
 // ===== FAVORİLER =====
