@@ -316,6 +316,100 @@ input::placeholder{color:var(--muted)}
 .lang-item.active{background:rgba(59,158,255,.15);color:var(--blue)}
 .lang-flag{font-size:1.1rem}
 
+/* ====== RESPONSIVE - MOBILE ====== */
+@media (max-width: 768px) {
+  nav{padding:0 12px;height:54px;gap:0;flex-wrap:nowrap;overflow:visible}
+  .nav-logo{margin-right:8px}
+  .nav-logo-text{font-size:.95rem}
+  .nav-logo-icon{width:30px;height:30px}
+  .nav-links{flex:1;gap:1px;justify-content:flex-start;overflow-x:auto;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-link{padding:6px 9px;font-size:.75rem;white-space:nowrap;flex-shrink:0}
+  .nav-link svg{width:14px;height:14px}
+  .nav-link span{display:none}
+  .lang-btn{padding:5px 9px;font-size:.72rem}
+  .lang-btn span:not(.lang-flag){display:none}
+  .lang-dropdown{right:0;min-width:150px}
+  .lang-dropdown .lang-item span:not(.lang-flag){display:inline}
+
+  .page{padding:14px 10px}
+  .hero{padding:30px 14px 20px}
+  .hero h1{font-size:1.75rem;letter-spacing:-.5px}
+  .hero p{font-size:.9rem;margin-bottom:20px}
+  .hero-tag{font-size:.7rem;padding:4px 10px;margin-bottom:14px}
+  .hero-search{flex-direction:column;gap:8px;max-width:100%}
+  .hero-search input{padding:12px 14px;font-size:.9rem}
+  .hero-search .btn{width:100%;justify-content:center}
+  .stats-row{gap:18px;margin-top:24px}
+  .stat-num{font-size:1.3rem}
+  .stat-label{font-size:.7rem}
+
+  .section{padding:0 12px 30px}
+  .popular-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .game-tile img{height:75px}
+  .game-tile .gt-name{font-size:.78rem}
+  .game-tile .gt-id{font-size:.65rem}
+
+  .page-wrap{padding:16px 12px}
+  .page-title{font-size:1.15rem;margin-bottom:14px}
+  .page-title svg{width:20px;height:20px}
+  .search-card{padding:14px}
+  .search-card label{font-size:.72rem}
+  .input-row{flex-direction:column;gap:8px}
+  .input-row .btn{width:100%;justify-content:center}
+  input[type=text],input[type=number]{font-size:.88rem;padding:10px 12px}
+  .divider{font-size:.72rem;margin:10px 0}
+
+  .discover-top{grid-template-columns:1fr;gap:10px}
+  .random-card{padding:16px;min-width:auto}
+  .dice{font-size:2.2rem}
+
+  .game-detail{grid-template-columns:1fr;gap:8px;padding:12px}
+  .game-detail-img{width:100%;height:80px}
+  .game-detail-name{font-size:.95rem}
+  .meta-chip{font-size:.68rem;padding:2px 7px}
+  .stats-bar{padding:10px 12px;gap:10px;font-size:.72rem}
+  .stat-item{font-size:.72rem}
+
+  .fav-section{padding:14px}
+  .fav-game-chip{font-size:.75rem;padding:5px 9px}
+  .fav-game-chip img{width:30px;height:12px}
+
+  .filters{gap:4px}
+  .fbtn{padding:5px 10px;font-size:.72rem}
+  .anim-toggle{padding:5px 9px;font-size:.7rem;order:10;width:100%;justify-content:center;margin-top:4px}
+  .grid-toggle{display:none}
+  .counter{font-size:.72rem;margin-left:auto}
+  #dla{padding:6px 10px;font-size:.72rem}
+
+  .grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .cname{font-size:.7rem}
+  .ctype{font-size:.62rem}
+  .dl{font-size:.7rem;padding:5px}
+  .type-badge{font-size:.58rem;padding:2px 5px}
+
+  .game-bar{padding:10px 14px;gap:10px}
+  .game-bar strong{font-size:.9rem}
+  .game-bar span{font-size:.72rem}
+
+  .modal{padding:16px;max-width:95%}
+  .modal-preview{aspect-ratio:1}
+
+  .appid-grid{grid-template-columns:1fr;gap:8px}
+  .appid-card{padding:10px 12px;gap:8px}
+  .appid-card img{width:50px;height:19px}
+  .appid-card .ac-name{font-size:.8rem}
+  .appid-card .ac-cat{font-size:.65rem}
+  .appid-card .ac-id{font-size:.7rem;padding:3px 8px}
+  .copy-btn{padding:4px 7px;font-size:.65rem}
+}
+
+@media (max-width: 480px) {
+  .hero h1{font-size:1.5rem}
+  .popular-grid{grid-template-columns:1fr 1fr}
+  .game-tile img{height:65px}
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -620,40 +714,45 @@ function buildAppIdPage() {
   // Kategori filtreleri
   const cats = ['Tümü', ...Object.keys(APPID_DB)];
   const catFilters = document.getElementById('cat-filters');
+  if (!catFilters) return;
   catFilters.innerHTML = cats.map(c =>
-    `<button class="fbtn ${c===activeGuidecat?'active':''}" onclick="setGuideCat('${c}')">${c}</button>`
+    `<button class="fbtn ${c===activeGuidecat?'active':''}" onclick="setGuideCat('${c}')">${getCatIcon(c)} ${c}</button>`
   ).join('');
 
   // Grid
   const grid = document.getElementById('appid-grid');
   const toShow = activeGuidecat === 'Tümü' ? APPID_DB : {[activeGuidecat]: APPID_DB[activeGuidecat]};
-  grid.innerHTML = Object.entries(toShow).map(([cat, games]) => `
-    <div class="section-group">
-      <div class="section-group-title">${getCatIcon(cat)} ${cat}</div>
-      <div class="appid-grid">
-        ${games.map(g => appidCard(g, cat)).join('')}
+  grid.innerHTML = Object.entries(toShow).map(([cat, games], idx) => {
+    const limit = activeGuidecat === 'Tümü' ? 3 : games.length;
+    const visibleGames = games.slice(0, limit);
+    const hasMore = games.length > limit;
+    return `
+      <div class="section-group" data-cat="${cat}">
+        <div class="section-group-title">
+          <span>${getCatIcon(cat)} ${cat}</span>
+          <span style="margin-left:auto;color:var(--muted);font-weight:400;font-size:.72rem">${games.length} ${t('items')}</span>
+        </div>
+        <div class="appid-grid" id="grid-${idx}">
+          ${visibleGames.map(g => appidCard(g, cat)).join('')}
+        </div>
+        ${hasMore ? `<button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="expandCat(${idx},'${cat}')">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+          Daha Fazla Göster (${games.length - limit})
+        </button>` : ''}
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
-function appidCard(g, cat) {
-  return `<div class="appid-card" onclick="goDownload('${g.appid}')">
-    <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/capsule_231x87.jpg" onerror="this.style.display='none'">
-    <div class="ac-info">
-      <div class="ac-name">${g.name}</div>
-      <div class="ac-cat">${cat}</div>
-    </div>
-    <span class="ac-id">${g.appid}</span>
-    <button class="copy-btn" onclick="event.stopPropagation();copyId(this,'${g.appid}')">
-      <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-      Kopyala
-    </button>
-  </div>`;
+function expandCat(idx, cat) {
+  const games = APPID_DB[cat];
+  const grid = document.getElementById('grid-'+idx);
+  grid.innerHTML = games.map(g => appidCard(g, cat)).join('');
+  grid.parentElement.querySelector('button.btn-ghost')?.remove();
 }
 
 function getCatIcon(cat) {
-  const icons = {'Ücretsiz':'🆓','Aksiyon':'⚔️','RPG':'🧙','Strateji':'♟️','Korku':'👻','Platform & Indie':'🎮','Çok Oyunculu':'👥'};
+  const icons = {'Tümü':'🎮','Ücretsiz':'🆓','Aksiyon':'⚔️','RPG':'🧙','Strateji':'♟️','Korku':'👻','Platform & Indie':'🎮','Çok Oyunculu':'👥','Free':'🆓','Action':'⚔️','Strategy':'♟️','Horror':'👻','Multiplayer':'👥','Action & Adventure':'⚔️'};
   return icons[cat] || '🎮';
 }
 
@@ -934,7 +1033,31 @@ function showPage(name){
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('.nav-link')[['home','download','discover','appids'].indexOf(name)].classList.add('active');
+  // Tarayıcı geçmişine ekle (geri tuşu için)
+  if (history.state?.page !== name) {
+    history.pushState({page: name}, '', '#' + name);
+  }
+  window.scrollTo(0, 0);
 }
+
+// Tarayıcı geri/ileri tuşu
+window.addEventListener('popstate', e => {
+  const name = e.state?.page || 'home';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.querySelectorAll('.nav-link')[['home','download','discover','appids'].indexOf(name)]?.classList.add('active');
+});
+
+// İlk yükleme — URL'deki hash'e göre sayfa aç
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash.replace('#','');
+  if (['home','download','discover','appids'].includes(hash)) {
+    showPage(hash);
+  } else {
+    history.replaceState({page:'home'}, '', '#home');
+  }
+});
 
 // Popüler grid
 (function(){
