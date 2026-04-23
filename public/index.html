@@ -711,6 +711,7 @@ const APPID_DB = {
 let activeGuidecat = 'Tümü';
 
 function buildAppIdPage() {
+  if (typeof APPID_DB === 'undefined') return;
   // Kategori filtreleri
   const cats = ['Tümü', ...Object.keys(APPID_DB)];
   const catFilters = document.getElementById('cat-filters');
@@ -721,6 +722,8 @@ function buildAppIdPage() {
 
   // Grid
   const grid = document.getElementById('appid-grid');
+  if (!grid) return;
+  const itemsLabel = (typeof window.I18N !== 'undefined' && typeof window.t === 'function') ? window.t('items') : 'öğe';
   const toShow = activeGuidecat === 'Tümü' ? APPID_DB : {[activeGuidecat]: APPID_DB[activeGuidecat]};
   grid.innerHTML = Object.entries(toShow).map(([cat, games], idx) => {
     const limit = activeGuidecat === 'Tümü' ? 3 : games.length;
@@ -730,7 +733,7 @@ function buildAppIdPage() {
       <div class="section-group" data-cat="${cat}">
         <div class="section-group-title">
           <span>${getCatIcon(cat)} ${cat}</span>
-          <span style="margin-left:auto;color:var(--muted);font-weight:400;font-size:.72rem">${games.length} ${t('items')}</span>
+          <span style="margin-left:auto;color:var(--muted);font-weight:400;font-size:.72rem">${games.length} ${itemsLabel}</span>
         </div>
         <div class="appid-grid" id="grid-${idx}">
           ${visibleGames.map(g => appidCard(g, cat)).join('')}
@@ -749,6 +752,22 @@ function expandCat(idx, cat) {
   const grid = document.getElementById('grid-'+idx);
   grid.innerHTML = games.map(g => appidCard(g, cat)).join('');
   grid.parentElement.querySelector('button.btn-ghost')?.remove();
+}
+
+function appidCard(g, cat) {
+  const copyLabel = (typeof window.t === 'function') ? window.t('copy') : 'Kopyala';
+  return `<div class="appid-card" onclick="goDownload('${g.appid}')">
+    <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/capsule_231x87.jpg" onerror="this.style.display='none'">
+    <div class="ac-info">
+      <div class="ac-name">${g.name}</div>
+      <div class="ac-cat">${cat}</div>
+    </div>
+    <span class="ac-id">${g.appid}</span>
+    <button class="copy-btn" onclick="event.stopPropagation();copyId(this,'${g.appid}')">
+      <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+      ${copyLabel}
+    </button>
+  </div>`;
 }
 
 function getCatIcon(cat) {
@@ -829,7 +848,7 @@ const POPULAR=[
 const RANDOM_IDS=['730','570','440','413150','1145360','367520','105600','504230','268910','381210'];
 
 // ===== DİL ÇEVİRİ SİSTEMİ =====
-const I18N = {
+window.I18N = {
   tr: {
     nav_home:'Anasayfa', nav_download:'İndir', nav_discover:'Keşfet', nav_appids:'App ID Rehberi',
     hero_tag:'Steam Puan Dükkanı İndirici',
@@ -980,7 +999,7 @@ const LANGS = [
 ];
 
 let currentLang = localStorage.getItem('steamdl_lang') || 'tr';
-function t(key) { return I18N[currentLang]?.[key] || I18N.tr[key] || key; }
+window.t = function(key) { return window.I18N[currentLang]?.[key] || window.I18N.tr[key] || key; };
 
 const TITLES = {
   tr:'SteamDL — Steam Puan Dükkanı Öğelerini Ücretsiz İndir',
