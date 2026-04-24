@@ -4,13 +4,88 @@ const cors = require('cors');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const archiver = require('archiver');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
+// Railway/proxy arkasında çalışırken gerçek IP'yi al
+app.set('trust proxy', 1);
+
+// ===== GÜVENLİK =====
+
+// Helmet — güvenlik header'ları
+app.use(helmet({
+  contentSecurityPolicy: false, // frontend için disable
+  crossOriginEmbedderPolicy: false
+}));
+
+// Rate limiting
+const generalLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 dakika
+  max: 60, // dakikada 60 istek
+  message: { error: 'Çok fazla istek. Lütfen bir dakika bekleyin.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const heavyLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10, // puppeteer kullanan endpoint'ler için daha sıkı
+  message: { error: 'Çok fazla arama. Lütfen bir dakika bekleyin.' },
+});
+
+const zipLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 dakika
+  max: 5, // 5 dakikada 5 zip
+  message: { error: 'ZIP indirme limiti aşıldı. 5 dakika bekleyin.' },
+});
+
+app.use(generalLimiter);
+app.use(cors({
+  origin: true,
+  methods: ['GET', 'POST'],
+}));
+app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ===== GÜVENLİK YARDIMCI FONKSİYONLAR =====
+
+// App ID sadece sayı olmalı, max 10 haneli
+function isValidAppId(appid) {
+  return /^\d{1,10}$/.test(String(appid));
+}
+
+// URL whitelist — sadece Steam/Akamai/Fastly CDN'lerinden indirmeye izin
+const ALLOWED_DOMAINS = [
+  'cdn.cloudflare.steamstatic.com',
+  'cdn.akamai.steamstatic.com',
+  'shared.akamai.steamstatic.com',
+  'shared.cloudflare.steamstatic.com',
+  'shared.fastly.steamstatic.com',
+  'community.cloudflare.steamstatic.com',
+  'community.akamai.steamstatic.com',
+  'community.fastly.steamstatic.com',
+  'media.st.dl.eccdnx.com',
+  'media.steampowered.com',
+  'steamcdn-a.akamaihd.net',
+  'steamcdn-a.opskins.media',
+];
+
+function isAllowedUrl(url) {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== 'https:') return false;
+    return ALLOWED_DOMAINS.some(d => u.hostname === d || u.hostname.endsWith('.' + d));
+  } catch { return false; }
+}
+
+// Filename sanitize — directory traversal önleme
+function sanitizeFilename(name) {
+  if (!name) return 'asset';
+  return String(name).replace(/[^a-zA-Z0-9_.-]/g, '_').slice(0, 100);
+}
 
 // Cache sistemi — 1 saat geçerli
 const cache = new Map();
@@ -32,24 +107,26 @@ const HEADERS = {
 // Oyun bilgisi
 app.get('/api/game/:appid', async (req, res) => {
   const { appid } = req.params;
+  if (!isValidAppId(appid)) return res.status(400).json({ error: 'Geçersiz App ID' });
   const cacheKey = `game_${appid}`;
   const cached = getCache(cacheKey);
   if (cached) return res.json(cached);
   try {
-    const r = await axios.get(`https://store.steampowered.com/api/appdetails?appids=${appid}&filters=basic`, { headers: HEADERS });
+    const r = await axios.get(`https://store.steampowered.com/api/appdetails?appids=${appid}&filters=basic`, { headers: HEADERS, timeout: 10000 });
     const d = r.data[appid];
     if (!d?.success) return res.status(404).json({ error: 'Oyun bulunamadı' });
     const result = { name: d.data.name, appid, img: `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/capsule_231x87.jpg` };
     setCache(cacheKey, result);
     res.json(result);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: 'Sunucu hatası' });
   }
 });
 
 // Puan dükkanı öğeleri
-app.get('/api/items/:appid', async (req, res) => {
+app.get('/api/items/:appid', heavyLimiter, async (req, res) => {
   const { appid } = req.params;
+  if (!isValidAppId(appid)) return res.status(400).json({ error: 'Geçersiz App ID' });
   const cacheKey = `items_${appid}`;
   const cached = getCache(cacheKey);
   if (cached) { console.log(`Cache hit: ${appid}`); return res.json(cached); }
@@ -172,11 +249,12 @@ app.get('/api/items/:appid', async (req, res) => {
 // Oyun detay (fiyat, puan, tarih, geliştirici)
 app.get('/api/gamedetail/:appid', async (req, res) => {
   const { appid } = req.params;
+  if (!isValidAppId(appid)) return res.status(400).json({ error: 'Geçersiz App ID' });
   const cacheKey = `detail_${appid}`;
   const cached = getCache(cacheKey);
   if (cached) return res.json(cached);
   try {
-    const r = await axios.get(`https://store.steampowered.com/api/appdetails?appids=${appid}&cc=TR&l=turkish`, { headers: HEADERS });
+    const r = await axios.get(`https://store.steampowered.com/api/appdetails?appids=${appid}&cc=TR&l=turkish`, { headers: HEADERS, timeout: 10000 });
     const d = r.data[appid]?.data;
     if (!d) return res.json({ error: 'Bulunamadı' });
     const result = {
@@ -188,39 +266,49 @@ app.get('/api/gamedetail/:appid', async (req, res) => {
     };
     setCache(cacheKey, result);
     res.json(result);
-  } catch(e) { res.json({ error: e.message }); }
+  } catch(e) { res.json({ error: 'Sunucu hatası' }); }
 });
 
 // Oyun adıyla arama
 app.get('/api/search', async (req, res) => {
-  const { q } = req.query;
-  if (!q) return res.json([]);
+  const q = String(req.query.q || '').slice(0, 100);
+  if (!q || q.length < 2) return res.json([]);
   try {
-    const r = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(q)}&l=turkish&cc=TR`, { headers: HEADERS });
-    const items = (r.data?.items || []).map(i => ({ appid: String(i.id), name: i.name }));
+    const r = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(q)}&l=turkish&cc=TR`, { headers: HEADERS, timeout: 10000 });
+    const items = (r.data?.items || []).slice(0, 10).map(i => ({ appid: String(i.id), name: String(i.name).slice(0, 100) }));
     res.json(items);
   } catch(e) { res.json([]); }
 });
 
 // Toplu ZIP indirme
-app.post('/api/zip', async (req, res) => {
+app.post('/api/zip', zipLimiter, async (req, res) => {
   const { items, appid, gameName } = req.body;
-  if (!items?.length) return res.status(400).json({ error: 'Öğe bulunamadı' });
 
-  const safeName = (gameName || appid).replace(/[^a-z0-9]/gi, '_');
+  // Validation
+  if (!Array.isArray(items) || !items.length) return res.status(400).json({ error: 'Öğe bulunamadı' });
+  if (items.length > 100) return res.status(400).json({ error: 'Çok fazla öğe (max 100)' });
+  if (!isValidAppId(appid)) return res.status(400).json({ error: 'Geçersiz App ID' });
+
+  // URL'leri whitelist kontrolü
+  const validItems = items.filter(item => {
+    const url = item.videoUrl || item.imgUrl;
+    return url && isAllowedUrl(url);
+  });
+  if (!validItems.length) return res.status(400).json({ error: 'Geçerli URL bulunamadı' });
+
+  const safeName = sanitizeFilename(gameName || appid);
   res.setHeader('Content-Disposition', `attachment; filename="${safeName}_assets.zip"`);
   res.setHeader('Content-Type', 'application/zip');
 
   const archive = archiver('zip', { zlib: { level: 6 } });
   archive.pipe(res);
 
-  for (const item of items) {
+  for (const item of validItems) {
     const url = item.videoUrl || item.imgUrl;
-    if (!url) continue;
     try {
-      const ext = url.split('.').pop().split('?')[0];
-      const fname = `${item.type}/${item.name.replace(/[^a-z0-9]/gi, '_')}.${ext}`;
-      const r = await axios.get(url, { responseType: 'stream', headers: HEADERS, timeout: 15000 });
+      const ext = sanitizeFilename(url.split('.').pop().split('?')[0]);
+      const fname = `${sanitizeFilename(item.type || 'item')}/${sanitizeFilename(item.name)}.${ext}`;
+      const r = await axios.get(url, { responseType: 'stream', headers: HEADERS, timeout: 15000, maxContentLength: 50 * 1024 * 1024 }); // max 50MB
       archive.append(r.data, { name: fname });
     } catch(e) { console.log(`ZIP hata (${item.name}):`, e.message); }
   }
@@ -228,19 +316,19 @@ app.post('/api/zip', async (req, res) => {
   archive.finalize();
 });
 
-// Proxy indirme
+// Proxy indirme (whitelisted URL'ler için)
 app.get('/api/download', async (req, res) => {
   const { url, filename } = req.query;
-  if (!url || !url.includes('steam')) return res.status(400).json({ error: 'Geçersiz URL' });
+  if (!url || !isAllowedUrl(url)) return res.status(400).json({ error: 'Geçersiz veya izinsiz URL' });
   try {
-    const r = await axios.get(url, { responseType: 'stream', headers: HEADERS });
-    const ext = url.split('.').pop().split('?')[0];
-    const fname = filename || `steam_asset.${ext}`;
+    const r = await axios.get(url, { responseType: 'stream', headers: HEADERS, timeout: 15000, maxContentLength: 50 * 1024 * 1024 });
+    const ext = sanitizeFilename(String(url).split('.').pop().split('?')[0]);
+    const fname = sanitizeFilename(filename) || `steam_asset.${ext}`;
     res.setHeader('Content-Disposition', `attachment; filename="${fname}"`);
     res.setHeader('Content-Type', r.headers['content-type'] || 'application/octet-stream');
     r.data.pipe(res);
   } catch (e) {
-    res.status(500).json({ error: 'İndirme hatası: ' + e.message });
+    res.status(500).json({ error: 'İndirme hatası' });
   }
 });
 
