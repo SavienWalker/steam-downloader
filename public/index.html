@@ -807,6 +807,7 @@ function getAppIdDb() {
 let activeGuidecat = 'Tümü';
 
 function buildAppIdPage() {
+  window.APPID_DB = getAppIdDb();
   if (typeof APPID_DB === 'undefined') return;
   // Kategori filtreleri
   const cats = ['Tümü', ...Object.keys(APPID_DB)];
