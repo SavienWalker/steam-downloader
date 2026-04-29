@@ -525,7 +525,7 @@ input::placeholder{color:var(--muted)}
     </div>
     <div class="zip-status" id="zip-status"></div>
     <div class="zip-modal-btns" id="zip-modal-btns">
-      <button class="btn btn-ghost" onclick="closeZipModal()">İptal</button>
+      <button class="btn btn-ghost" id="zip-cancel-btn" onclick="closeZipModal()">İptal</button>
       <button class="btn btn-green" id="zip-confirm-btn" onclick="confirmZipDownload()">
         <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
         İndir
@@ -544,7 +544,7 @@ input::placeholder{color:var(--muted)}
     <div class="modal-actions">
       <button class="btn" id="modal-dl-btn" style="flex:1">
         <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-        İndir
+        <span data-i18n="preview_download">İndir</span>
       </button>
     </div>
   </div>
@@ -666,36 +666,36 @@ input::placeholder{color:var(--muted)}
   <div class="page-wrap">
     <div class="page-title">
       <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      Öğe İndir
+      <span data-i18n="dl_title">Öğe İndir</span>
     </div>
     <div class="search-card">
-      <label>Oyun Adıyla Ara</label>
+      <label data-i18n="dl_by_name">Oyun Adıyla Ara</label>
       <div class="input-row">
         <div class="autocomplete-wrap">
-          <input type="text" id="name-search" placeholder="Örn: Counter-Strike, Stardew Valley..." oninput="onNameInput()" onkeydown="if(event.key==='Enter')searchByName()">
+          <input type="text" id="name-search" data-i18n-ph="dl_by_name_ph" placeholder="Örn: Counter-Strike, Stardew Valley..." oninput="onNameInput()" onkeydown="if(event.key==='Enter')searchByName()">
           <div class="ac-list" id="ac-list"></div>
         </div>
         <button class="btn" onclick="searchByName()">
           <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          Ara
+          <span data-i18n="search">Ara</span>
         </button>
       </div>
-      <div class="divider">veya App ID ile</div>
+      <div class="divider" data-i18n="dl_or_appid">veya App ID ile</div>
       <div class="input-row">
         <input type="number" id="appid-input" placeholder="730 = CS2 · 570 = Dota 2 · 440 = TF2" onkeydown="if(event.key==='Enter')searchById()">
         <button class="btn" onclick="searchById()">
           <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          Ara
+          <span data-i18n="search">Ara</span>
         </button>
       </div>
       <div class="hint">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        store.steampowered.com/app/<strong>APPID</strong>/oyun-adi
+        store.steampowered.com/app/<strong>APPID</strong>/<span data-i18n="appid_hint_text">oyun-adi</span>
       </div>
     </div>
     <div id="dl-error"></div>
     <div id="dl-game-info"></div>
-    <div class="loader" id="dl-loader"><div class="spin"></div><p>Öğeler yükleniyor… (15–30 sn sürebilir)</p></div>
+    <div class="loader" id="dl-loader"><div class="spin"></div><p data-i18n="loading_items">Öğeler yükleniyor… (15–30 sn sürebilir)</p></div>
     <div id="dl-results"></div>
   </div>
 </div>
@@ -705,31 +705,31 @@ input::placeholder{color:var(--muted)}
   <div class="page-wrap">
     <div class="page-title">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-      Keşfet
+      <span data-i18n="disc_title">Keşfet</span>
     </div>
     <div class="discover-top">
       <div class="search-card" style="margin:0">
-        <label>Oyun Adıyla Keşfet</label>
+        <label data-i18n="disc_by_name">Oyun Adıyla Keşfet</label>
         <div class="input-row">
           <div class="autocomplete-wrap">
-            <input type="text" id="disc-search" placeholder="Oyun adı yaz..." oninput="onDiscInput()" onkeydown="if(event.key==='Enter')discSearchByName()">
+            <input type="text" id="disc-search" data-i18n-ph="disc_ph" placeholder="Oyun adı yaz..." oninput="onDiscInput()" onkeydown="if(event.key==='Enter')discSearchByName()">
             <div class="ac-list" id="disc-ac-list"></div>
           </div>
           <button class="btn" onclick="discSearchByName()">
             <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            Ara
+            <span data-i18n="search">Ara</span>
           </button>
         </div>
       </div>
       <div class="random-card" onclick="randomGame()">
         <div class="dice">🎲</div>
-        <strong>Rastgele Oyun</strong>
-        <p>Sürpriz bir oyunun öğelerini keşfet!</p>
+        <strong data-i18n="random">Rastgele Oyun</strong>
+        <p data-i18n="random_desc">Sürpriz bir oyunun öğelerini keşfet!</p>
       </div>
     </div>
     <div id="disc-error"></div>
     <div id="disc-game-info"></div>
-    <div class="loader" id="disc-loader"><div class="spin"></div><p>Yükleniyor…</p></div>
+    <div class="loader" id="disc-loader"><div class="spin"></div><p data-i18n="loading">Yükleniyor…</p></div>
     <div id="disc-results"></div>
   </div>
 </div>
@@ -739,20 +739,20 @@ input::placeholder{color:var(--muted)}
   <div class="page-wrap" style="max-width:1100px">
     <div class="page-title">
       <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
-      App ID Rehberi
+      <span data-i18n="appids_title">App ID Rehberi</span>
     </div>
 
     <!-- Arama -->
     <div class="search-card" style="margin-bottom:28px">
-      <label>Oyun Adıyla App ID Bul</label>
+      <label data-i18n="appids_search">Oyun Adıyla App ID Bul</label>
       <div class="input-row">
         <div class="autocomplete-wrap">
-          <input type="text" id="appid-guide-search" placeholder="Oyun adı yaz, App ID'sini bul..." oninput="onGuideInput()" onkeydown="if(event.key==='Enter')guideSearch()">
+          <input type="text" id="appid-guide-search" data-i18n-ph="appids_ph" placeholder="Oyun adı yaz, App ID'sini bul..." oninput="onGuideInput()" onkeydown="if(event.key==='Enter')guideSearch()">
           <div class="ac-list" id="guide-ac-list"></div>
         </div>
         <button class="btn" onclick="guideSearch()">
           <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          Ara
+          <span data-i18n="search">Ara</span>
         </button>
       </div>
       <div id="guide-search-results" style="margin-top:14px"></div>
@@ -785,78 +785,24 @@ input::placeholder{color:var(--muted)}
 </style>
 
 <script>
-const APPID_DB = {
-  'Ücretsiz':[
-    {name:'Counter-Strike 2',appid:'730'},
-    {name:'Dota 2',appid:'570'},
-    {name:'Team Fortress 2',appid:'440'},
-    {name:'Apex Legends',appid:'1172470'},
-    {name:'Warframe',appid:'230410'},
-    {name:'Path of Exile',appid:'238960'},
-    {name:'Among Us',appid:'945360'},
-    {name:'Brawlhalla',appid:'291550'},
-  ],
-  'Aksiyon':[
-    {name:'Cyberpunk 2077',appid:'1091500'},
-    {name:'Elden Ring',appid:'1245620'},
-    {name:'Dark Souls III',appid:'374320'},
-    {name:'Sekiro',appid:'814380'},
-    {name:'Devil May Cry 5',appid:'601150'},
-    {name:'Doom Eternal',appid:'782330'},
-    {name:'Cuphead',appid:'268910'},
-    {name:'Dead Cells',appid:'588650'},
-  ],
-  'RPG':[
-    {name:'Hades',appid:'1145360'},
-    {name:'Divinity: Original Sin 2',appid:'435150'},
-    {name:'Baldur\'s Gate 3',appid:'1086940'},
-    {name:'The Witcher 3',appid:'292030'},
-    {name:'Stardew Valley',appid:'413150'},
-    {name:'Persona 4 Golden',appid:'1113000'},
-    {name:'Monster Hunter: World',appid:'582010'},
-    {name:'Dragon Age: Origins',appid:'47810'},
-  ],
-  'Strateji':[
-    {name:'Civilization VI',appid:'289070'},
-    {name:'Total War: WARHAMMER III',appid:'1142710'},
-    {name:'Age of Empires IV',appid:'1466860'},
-    {name:'Crusader Kings III',appid:'1158310'},
-    {name:'Stellaris',appid:'281990'},
-    {name:'XCOM 2',appid:'268500'},
-    {name:'Victoria 3',appid:'529340'},
-    {name:'Into the Breach',appid:'590380'},
-  ],
-  'Korku':[
-    {name:'Dead by Daylight',appid:'381210'},
-    {name:'Phasmophobia',appid:'739630'},
-    {name:'Resident Evil 2',appid:'883710'},
-    {name:'Resident Evil Village',appid:'1196590'},
-    {name:'Amnesia: The Bunker',appid:'1944430'},
-    {name:'Little Nightmares',appid:'424840'},
-    {name:'Outlast',appid:'238320'},
-    {name:'Layers of Fear',appid:'391720'},
-  ],
-  'Platform & Indie':[
-    {name:'Hollow Knight',appid:'367520'},
-    {name:'Celeste',appid:'504230'},
-    {name:'Terraria',appid:'105600'},
-    {name:'Ori and the Will of the Wisps',appid:'1057090'},
-    {name:'Shovel Knight',appid:'250760'},
-    {name:'A Short Hike',appid:'1055540'},
-    {name:'Undertale',appid:'391540'},
-    {name:'Disco Elysium',appid:'632470'},
-  ],
-  'Çok Oyunculu':[
-    {name:'Rust',appid:'252490'},
-    {name:'ARK: Survival Evolved',appid:'346110'},
-    {name:'Fall Guys',appid:'1097150'},
-    {name:'Pummel Party',appid:'875010'},
-    {name:'Human: Fall Flat',appid:'477160'},
-    {name:'Garry\'s Mod',appid:'4000'},
-    {name:'Left 4 Dead 2',appid:'550'},
-    {name:'Payday 2',appid:'218620'},
-  ],
+const APPID_DB_KEYS = {
+  'cat_free': [{name:'Counter-Strike 2',appid:'730'},{name:'Dota 2',appid:'570'},{name:'Team Fortress 2',appid:'440'},{name:'Apex Legends',appid:'1172470'},{name:'Warframe',appid:'230410'},{name:'Path of Exile',appid:'238960'},{name:'Among Us',appid:'945360'},{name:'Brawlhalla',appid:'291550'}],
+  'cat_action': [{name:'Cyberpunk 2077',appid:'1091500'},{name:'Elden Ring',appid:'1245620'},{name:'Dark Souls III',appid:'374320'},{name:'Sekiro',appid:'814380'},{name:'Devil May Cry 5',appid:'601150'},{name:'Doom Eternal',appid:'782330'},{name:'Cuphead',appid:'268910'},{name:'Dead Cells',appid:'588650'}],
+  'cat_rpg': [{name:'Hades',appid:'1145360'},{name:'Divinity: Original Sin 2',appid:'435150'},{name:"Baldur's Gate 3",appid:'1086940'},{name:'The Witcher 3',appid:'292030'},{name:'Stardew Valley',appid:'413150'},{name:'Persona 4 Golden',appid:'1113000'},{name:'Monster Hunter: World',appid:'582010'},{name:'Dragon Age: Origins',appid:'47810'}],
+  'cat_strategy': [{name:'Civilization VI',appid:'289070'},{name:'Total War: WARHAMMER III',appid:'1142710'},{name:'Age of Empires IV',appid:'1466860'},{name:'Crusader Kings III',appid:'1158310'},{name:'Stellaris',appid:'281990'},{name:'XCOM 2',appid:'268500'},{name:'Victoria 3',appid:'529340'},{name:'Into the Breach',appid:'590380'}],
+  'cat_horror': [{name:'Dead by Daylight',appid:'381210'},{name:'Phasmophobia',appid:'739630'},{name:'Resident Evil 2',appid:'883710'},{name:'Resident Evil Village',appid:'1196590'},{name:'Amnesia: The Bunker',appid:'1944430'},{name:'Little Nightmares',appid:'424840'},{name:'Outlast',appid:'238320'},{name:'Layers of Fear',appid:'391720'}],
+  'cat_indie': [{name:'Hollow Knight',appid:'367520'},{name:'Celeste',appid:'504230'},{name:'Terraria',appid:'105600'},{name:'Ori and the Will of the Wisps',appid:'1057090'},{name:'Shovel Knight',appid:'250760'},{name:'A Short Hike',appid:'1055540'},{name:'Undertale',appid:'391540'},{name:'Disco Elysium',appid:'632470'}],
+  'cat_multi': [{name:'Rust',appid:'252490'},{name:'ARK: Survival Evolved',appid:'346110'},{name:'Fall Guys',appid:'1097150'},{name:'Pummel Party',appid:'875010'},{name:'Human: Fall Flat',appid:'477160'},{name:"Garry's Mod",appid:'4000'},{name:'Left 4 Dead 2',appid:'550'},{name:'Payday 2',appid:'218620'}],
 };
+
+function getAppIdDb() {
+  const tFunc = (typeof window.t === 'function') ? window.t : (k) => k;
+  const db = {};
+  for (const [key, games] of Object.entries(APPID_DB_KEYS)) {
+    db[tFunc(key)] = games;
+  }
+  return db;
+}
 
 let activeGuidecat = 'Tümü';
 
@@ -873,7 +819,8 @@ function buildAppIdPage() {
   // Grid
   const grid = document.getElementById('appid-grid');
   if (!grid) return;
-  const itemsLabel = (typeof window.I18N !== 'undefined' && typeof window.t === 'function') ? window.t('items') : 'öğe';
+  const itemsLabel = (typeof window.t === 'function') ? window.t('items') : 'öğe';
+  const showMoreLabel = (typeof window.t === 'function') ? window.t('show_more') : 'Daha Fazla Göster';
   const toShow = activeGuidecat === 'Tümü' ? APPID_DB : {[activeGuidecat]: APPID_DB[activeGuidecat]};
   grid.innerHTML = Object.entries(toShow).map(([cat, games], idx) => {
     const limit = activeGuidecat === 'Tümü' ? 3 : games.length;
@@ -890,7 +837,7 @@ function buildAppIdPage() {
         </div>
         ${hasMore ? `<button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="expandCat(${idx},'${cat}')">
           <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
-          Daha Fazla Göster (${games.length - limit})
+          ${showMoreLabel} (${games.length - limit})
         </button>` : ''}
       </div>
     `;
@@ -927,17 +874,16 @@ function getCatIcon(cat) {
 
 function setGuideCat(cat) {
   activeGuidecat = cat;
-  buildAppIdPage();
 applyLang();
 }
 
 function copyId(btn, appid) {
   navigator.clipboard.writeText(appid);
   btn.classList.add('copied');
-  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Kopyalandı`;
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> ${window.t('copied')}`;
   setTimeout(() => {
     btn.classList.remove('copied');
-    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Kopyala`;
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> ${window.t('copy')}`;
   }, 2000);
 }
 
@@ -1020,7 +966,13 @@ window.I18N = {
     loading_items:'Öğeler yükleniyor… (15–30 sn sürebilir)', loading:'Yükleniyor…',
     copy:'Kopyala', copied:'Kopyalandı', not_found:'Oyun bulunamadı.', game_not_found:'Oyun bulunamadı',
     cat_free:'Ücretsiz', cat_action:'Aksiyon', cat_rpg:'RPG', cat_strategy:'Strateji', cat_horror:'Korku', cat_indie:'Platform & Indie', cat_multi:'Çok Oyunculu',
-    search_result:'Arama Sonucu',
+    search_result:'Arama Sonucu', show_more:'Daha Fazla Göster',
+    zip_title:'ZIP İndir', zip_desc:'öğe tek dosya olarak indirilecek.',
+    zip_preparing:'Hazırlanıyor...', zip_packing:'Öğeler paketleniyor...', zip_starting:'İndirme başlatılıyor...',
+    zip_done:'✅ İndirme başladı!', zip_error:'Hata:', zip_retry:'Tekrar Dene',
+    cancel:'İptal', preview_download:'İndir',
+    or_appid:'veya App ID ile',
+    appid_hint_text:'oyun-adi',
   },
   en: {
     nav_home:'Home', nav_download:'Download', nav_discover:'Discover', nav_appids:'App ID Guide',
@@ -1043,7 +995,13 @@ window.I18N = {
     loading_items:'Loading items… (may take 15–30s)', loading:'Loading…',
     copy:'Copy', copied:'Copied', not_found:'Game not found.', game_not_found:'Game not found',
     cat_free:'Free', cat_action:'Action', cat_rpg:'RPG', cat_strategy:'Strategy', cat_horror:'Horror', cat_indie:'Platform & Indie', cat_multi:'Multiplayer',
-    search_result:'Search Result',
+    search_result:'Search Result', show_more:'Show More',
+    zip_title:'Download ZIP', zip_desc:'items will be downloaded as one file.',
+    zip_preparing:'Preparing...', zip_packing:'Packing items...', zip_starting:'Starting download...',
+    zip_done:'✅ Download started!', zip_error:'Error:', zip_retry:'Try Again',
+    cancel:'Cancel', preview_download:'Download',
+    or_appid:'or by App ID',
+    appid_hint_text:'game-name',
   },
   de: {
     nav_home:'Startseite', nav_download:'Herunterladen', nav_discover:'Entdecken', nav_appids:'App-ID-Leitfaden',
@@ -1058,15 +1016,21 @@ window.I18N = {
     dl_hint:'store.steampowered.com/app/',
     disc_title:'Entdecken', disc_by_name:'Nach Namen entdecken', disc_ph:'Spielnamen eingeben...',
     random:'Zufälliges Spiel', random_desc:'Entdecke Inhalte eines Überraschungsspiels!',
-    appids_title:'App-ID-Leitfaden', appids_search:'App-ID nach Spielname finden', appids_ph:'Spielnamen eingeben, um App-ID zu finden...',
+    appids_title:'App-ID-Leitfaden', appids_search:'App-ID nach Spielname finden', appids_ph:'Spielnamen eingeben...',
     fav_title:'Meine Lieblingsspiele', fav_empty:'Noch keine Favoriten. Klicke ⭐ bei der Suche.',
     download:'Herunterladen', download_all:'Alle herunterladen (ZIP)', download_all_confirm:'Inhalte werden als ZIP heruntergeladen. Fortfahren?',
     preparing:'Wird vorbereitet...', only_anim:'Nur animiert', show_all:'Alle anzeigen',
-    all:'Alle', items:'Inhalte', items_found:'Inhalte gefunden', no_items:'Keine Punkte-Shop-Inhalte für dieses Spiel gefunden.',
+    all:'Alle', items:'Inhalte', items_found:'Inhalte gefunden', no_items:'Keine Punkte-Shop-Inhalte gefunden.',
     loading_items:'Inhalte werden geladen… (kann 15–30s dauern)', loading:'Wird geladen…',
     copy:'Kopieren', copied:'Kopiert', not_found:'Spiel nicht gefunden.', game_not_found:'Spiel nicht gefunden',
     cat_free:'Kostenlos', cat_action:'Action', cat_rpg:'RPG', cat_strategy:'Strategie', cat_horror:'Horror', cat_indie:'Platform & Indie', cat_multi:'Mehrspieler',
-    search_result:'Suchergebnis',
+    search_result:'Suchergebnis', show_more:'Mehr anzeigen',
+    zip_title:'ZIP herunterladen', zip_desc:'Inhalte werden als eine Datei heruntergeladen.',
+    zip_preparing:'Wird vorbereitet...', zip_packing:'Inhalte werden verpackt...', zip_starting:'Download wird gestartet...',
+    zip_done:'✅ Download gestartet!', zip_error:'Fehler:', zip_retry:'Erneut versuchen',
+    cancel:'Abbrechen', preview_download:'Herunterladen',
+    or_appid:'oder per App-ID',
+    appid_hint_text:'spiel-name',
   },
   ja: {
     nav_home:'ホーム', nav_download:'ダウンロード', nav_discover:'発見', nav_appids:'App ID ガイド',
@@ -1081,7 +1045,7 @@ window.I18N = {
     dl_hint:'store.steampowered.com/app/',
     disc_title:'発見', disc_by_name:'名前で発見', disc_ph:'ゲーム名を入力...',
     random:'ランダムゲーム', random_desc:'サプライズゲームのアイテムを発見！',
-    appids_title:'App ID ガイド', appids_search:'ゲーム名で App ID を検索', appids_ph:'ゲーム名を入力して App ID を検索...',
+    appids_title:'App ID ガイド', appids_search:'ゲーム名で App ID を検索', appids_ph:'ゲーム名を入力...',
     fav_title:'お気に入りのゲーム', fav_empty:'まだお気に入りがありません。検索時に ⭐ をクリック。',
     download:'ダウンロード', download_all:'すべてダウンロード (ZIP)', download_all_confirm:'個のアイテムを ZIP でダウンロードします。続行？',
     preparing:'準備中...', only_anim:'アニメのみ', show_all:'すべて表示',
@@ -1089,7 +1053,13 @@ window.I18N = {
     loading_items:'読み込み中… (15〜30秒)', loading:'読み込み中…',
     copy:'コピー', copied:'コピー済み', not_found:'ゲームが見つかりません。', game_not_found:'ゲームが見つかりません',
     cat_free:'無料', cat_action:'アクション', cat_rpg:'RPG', cat_strategy:'ストラテジー', cat_horror:'ホラー', cat_indie:'プラットフォーム・インディー', cat_multi:'マルチプレイヤー',
-    search_result:'検索結果',
+    search_result:'検索結果', show_more:'もっと見る',
+    zip_title:'ZIP ダウンロード', zip_desc:'個のアイテムを1つのファイルとしてダウンロードします。',
+    zip_preparing:'準備中...', zip_packing:'アイテムをパッキング中...', zip_starting:'ダウンロード開始中...',
+    zip_done:'✅ ダウンロード開始！', zip_error:'エラー：', zip_retry:'再試行',
+    cancel:'キャンセル', preview_download:'ダウンロード',
+    or_appid:'または App ID で',
+    appid_hint_text:'ゲーム名',
   },
   es: {
     nav_home:'Inicio', nav_download:'Descargar', nav_discover:'Descubrir', nav_appids:'Guía App ID',
@@ -1112,7 +1082,13 @@ window.I18N = {
     loading_items:'Cargando artículos… (puede tardar 15–30s)', loading:'Cargando…',
     copy:'Copiar', copied:'Copiado', not_found:'Juego no encontrado.', game_not_found:'Juego no encontrado',
     cat_free:'Gratis', cat_action:'Acción', cat_rpg:'RPG', cat_strategy:'Estrategia', cat_horror:'Terror', cat_indie:'Plataforma & Indie', cat_multi:'Multijugador',
-    search_result:'Resultado de Búsqueda',
+    search_result:'Resultado de Búsqueda', show_more:'Mostrar más',
+    zip_title:'Descargar ZIP', zip_desc:'artículos se descargarán como un solo archivo.',
+    zip_preparing:'Preparando...', zip_packing:'Empaquetando artículos...', zip_starting:'Iniciando descarga...',
+    zip_done:'✅ ¡Descarga iniciada!', zip_error:'Error:', zip_retry:'Reintentar',
+    cancel:'Cancelar', preview_download:'Descargar',
+    or_appid:'o por App ID',
+    appid_hint_text:'nombre-juego',
   },
   fr: {
     nav_home:'Accueil', nav_download:'Télécharger', nav_discover:'Découvrir', nav_appids:'Guide App ID',
@@ -1135,7 +1111,13 @@ window.I18N = {
     loading_items:'Chargement… (15–30s)', loading:'Chargement…',
     copy:'Copier', copied:'Copié', not_found:'Jeu non trouvé.', game_not_found:'Jeu non trouvé',
     cat_free:'Gratuit', cat_action:'Action', cat_rpg:'RPG', cat_strategy:'Stratégie', cat_horror:'Horreur', cat_indie:'Plateforme & Indie', cat_multi:'Multijoueur',
-    search_result:'Résultat de Recherche',
+    search_result:'Résultat de Recherche', show_more:'Voir plus',
+    zip_title:'Télécharger ZIP', zip_desc:'articles seront téléchargés en un seul fichier.',
+    zip_preparing:'Préparation...', zip_packing:'Emballage des articles...', zip_starting:'Démarrage du téléchargement...',
+    zip_done:'✅ Téléchargement démarré !', zip_error:'Erreur :', zip_retry:'Réessayer',
+    cancel:'Annuler', preview_download:'Télécharger',
+    or_appid:'ou par App ID',
+    appid_hint_text:'nom-jeu',
   },
 };
 
@@ -1148,8 +1130,8 @@ const LANGS = [
   {code:'fr', flag:'🇫🇷', name:'Français'},
 ];
 
-let currentLang = localStorage.getItem('steamdl_lang') || 'tr';
-window.t = function(key) { return window.I18N[currentLang]?.[key] || window.I18N.tr[key] || key; };
+window.currentLang = localStorage.getItem('steamdl_lang') || 'tr';
+window.t = function(key) { return window.I18N[window.currentLang]?.[key] || window.I18N.tr[key] || key; };
 
 const TITLES = {
   tr:'SteamDL — Steam Puan Dükkanı Öğelerini Ücretsiz İndir',
@@ -1167,21 +1149,21 @@ function applyLang() {
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     el.placeholder = t(el.dataset.i18nPh);
   });
-  document.documentElement.lang = currentLang;
-  document.title = TITLES[currentLang] || TITLES.tr;
+  document.documentElement.lang = window.currentLang;
+  document.title = TITLES[window.currentLang] || TITLES.tr;
   updateLangBtn();
   if (typeof buildAppIdPage === 'function') buildAppIdPage();
   if (typeof renderFavs === 'function') renderFavs();
 }
 
 function updateLangBtn() {
-  const lang = LANGS.find(l => l.code === currentLang);
+  const lang = LANGS.find(l => l.code === window.currentLang);
   const btn = document.getElementById('lang-btn-content');
   if (btn) btn.innerHTML = `<span class="lang-flag">${lang.flag}</span> ${lang.name.substring(0,3).toUpperCase()}`;
 }
 
 function setLang(code) {
-  currentLang = code;
+  window.currentLang = code;
   localStorage.setItem('steamdl_lang', code);
   document.getElementById('lang-dropdown').classList.remove('open');
   applyLang();
@@ -1415,27 +1397,28 @@ function renderGrid(items, appid, containerId, gameName='') {
   currentItems = items;
   currentAppid = appid;
   currentGameName = gameName;
-  let activeType = 'Tümü';
+  const ALL = '__all__';
+  let activeType = ALL;
   showAnimOnly = false;
-  const types = ['Tümü', ...new Set(items.map(i=>i.type))];
+  const types = [ALL, ...new Set(items.map(i=>i.type))];
   const el = document.getElementById(containerId);
   const render = () => {
-    let filtered = activeType === 'Tümü' ? items : items.filter(i=>i.type===activeType);
+    let filtered = activeType === ALL ? items : items.filter(i=>i.type===activeType);
     if (showAnimOnly) filtered = filtered.filter(i => i.videoUrl);
     currentItems = filtered;
     const gridClass = gridSize === 'medium' ? '' : gridSize;
     el.innerHTML = `
       <div class="filters">
-        ${types.map(t=>`<button class="fbtn ${t===activeType?'active':''}" data-type="${t}">${t} (${t==='Tümü'?items.length:items.filter(i=>i.type===t).length})</button>`).join('')}
-        <span class="counter">${filtered.length} öğe</span>
+        ${types.map(type=>`<button class="fbtn ${type===activeType?'active':''}" data-type="${type}">${type===ALL?window.t('all'):type} (${type===ALL?items.length:items.filter(i=>i.type===type).length})</button>`).join('')}
+        <span class="counter">${filtered.length} ${window.t('items')}</span>
         <button class="anim-toggle ${showAnimOnly?'active':''}" onclick="showAnimOnly=!showAnimOnly;renderCurrent()">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          ${showAnimOnly ? 'Tümünü Göster' : 'Sadece Animasyonlu'}
+          ${showAnimOnly ? window.t('show_all') : window.t('only_anim')}
         </button>
         ${gridToggleHTML()}
         <button class="btn btn-green btn-sm" id="dla" onclick="triggerZipDownload()">
           <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-          Tümünü İndir (ZIP)
+          ${window.t('download_all')}
         </button>
       </div>
       <div class="grid ${gridClass}">
@@ -1457,8 +1440,8 @@ function renderGrid(items, appid, containerId, gameName='') {
               <div class="ctype">${it.type}</div>
               ${url?`<button class="dl" onclick="dlFile('${url}','${fname}')">
                 <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                İndir
-              </button>`:`<button class="dl" disabled style="opacity:.3">Yok</button>`}
+                ${window.t('download')}
+              </button>`:`<button class="dl" disabled style="opacity:.3">N/A</button>`}
             </div>
           </div>`;
         }).join('')}
@@ -1477,7 +1460,7 @@ function triggerZipDownload() {
 }
 async function dlAll(items,appid){
   const list=items.filter(i=>i.videoUrl||i.imgUrl);
-  if(!confirm(`${list.length} öğe indirilecek. Devam?`))return;
+  if(!confirm(`${list.length} ${window.t('download_all_confirm')}`))return;
   for(const it of list){
     const url=it.videoUrl||it.imgUrl;
     const ext=url.split('.').pop().split('?')[0];
@@ -1549,11 +1532,13 @@ function triggerZipDownload() {
   _zipAppid = currentAppid;
   _zipGameName = currentGameName;
   if (!_zipItems.length) return;
-  document.getElementById('zip-modal-title').textContent = `${_zipGameName || _zipAppid} — ZIP İndir`;
-  document.getElementById('zip-modal-desc').textContent = `${_zipItems.length} öğe tek dosya olarak indirilecek.`;
+  document.getElementById('zip-modal-title').textContent = `${_zipGameName || _zipAppid} — ${t('zip_title')}`;
+  document.getElementById('zip-modal-desc').textContent = `${_zipItems.length} ${t('zip_desc')}`;
   document.getElementById('zip-progress').style.display = 'none';
   document.getElementById('zip-status').textContent = '';
   document.getElementById('zip-modal-btns').style.display = 'flex';
+  document.getElementById('zip-cancel-btn').textContent = t('cancel');
+  document.getElementById('zip-confirm-btn').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> ${t('download')}`;
   document.getElementById('zip-modal').classList.add('open');
 }
 
@@ -1569,9 +1554,9 @@ async function confirmZipDownload() {
   const status = document.getElementById('zip-status');
 
   btn.disabled = true;
-  btn.innerHTML = '⏳ Hazırlanıyor...';
+  btn.innerHTML = `⏳ ${window.t('preparing')}`;
   progress.style.display = 'block';
-  status.textContent = 'Sunucuya istek gönderiliyor...';
+  status.textContent = window.t('zip_preparing');
 
   // Sahte progress animasyonu
   let pct = 0;
@@ -1581,7 +1566,7 @@ async function confirmZipDownload() {
   }, 400);
 
   try {
-    status.textContent = 'Öğeler paketleniyor...';
+    status.textContent = window.t('zip_packing');
     const r = await fetch('/api/zip', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1593,7 +1578,7 @@ async function confirmZipDownload() {
     if (!r.ok) throw new Error(`Sunucu hatası: ${r.status}`);
 
     progressBar.style.width = '95%';
-    status.textContent = 'İndirme başlatılıyor...';
+    status.textContent = window.t('zip_starting');
 
     const blob = await r.blob();
     progressBar.style.width = '100%';
@@ -1605,16 +1590,16 @@ async function confirmZipDownload() {
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    status.textContent = '✅ İndirme başladı!';
+    status.textContent = window.t('zip_done');
     btns.style.display = 'none';
     setTimeout(() => closeZipModal(), 2000);
 
   } catch(e) {
     clearInterval(timer);
     progressBar.style.width = '0%';
-    status.textContent = '❌ Hata: ' + e.message;
+    status.textContent = '❌ ' + window.t('zip_error') + ' ' + e.message;
     btn.disabled = false;
-    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Tekrar Dene';
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> ${window.t('zip_retry')}`;
   }
 }
 
@@ -1659,7 +1644,7 @@ function toggleFav(appid, name) {
 function renderFavs() {
   const el = document.getElementById('fav-games');
   if (!el) return;
-  if (!favs.length) { el.innerHTML = '<span class="no-favs">Henüz favori oyun eklemediniz. Bir oyun ararken ⭐ ikonuna tıklayın.</span>'; return; }
+  if (!favs.length) { el.innerHTML = `<span class="no-favs">${window.t('fav_empty')}</span>`; return; }
   el.innerHTML = favs.map(f => `
     <div class="fav-game-chip" onclick="goDownload('${f.appid}')">
       <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/${f.appid}/capsule_231x87.jpg" onerror="this.style.display='none'">
@@ -1668,6 +1653,7 @@ function renderFavs() {
     </div>`).join('');
 }
 renderFavs();
+applyLang();
 
 // ===== ÖNİZLEME MODAL =====
 function openPreview(item, appid) {
