@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const puppeteer = require('puppeteer');
 const archiver = require('archiver');
 const helmet = require('helmet');
@@ -15,16 +16,14 @@ app.set('trust proxy', 1);
 
 // ===== GÜVENLİK =====
 
-// Helmet — güvenlik header'ları
 app.use(helmet({
-  contentSecurityPolicy: false, // frontend için disable
+  contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false
 }));
 
-// Rate limiting
 const generalLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 dakika
-  max: 60, // dakikada 60 istek
+  windowMs: 60 * 1000,
+  max: 60,
   message: { error: 'Çok fazla istek. Lütfen bir dakika bekleyin.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -32,13 +31,13 @@ const generalLimiter = rateLimit({
 
 const heavyLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 10, // puppeteer kullanan endpoint'ler için daha sıkı
+  max: 10,
   message: { error: 'Çok fazla arama. Lütfen bir dakika bekleyin.' },
 });
 
 const zipLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 dakika
-  max: 5, // 5 dakikada 5 zip
+  windowMs: 5 * 60 * 1000,
+  max: 5,
   message: { error: 'ZIP indirme limiti aşıldı. 5 dakika bekleyin.' },
 });
 
@@ -50,14 +49,40 @@ app.use(cors({
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ===== ANALİTİK SİSTEMİ =====
+
+const LOG_FILE = path.join(__dirname, 'logs.json');
+const ADMIN_KEY = process.env.ADMIN_KEY || 'steamdl-admin-2024';
+
+// Log dosyasını oku veya boş başlat
+let logs = [];
+try {
+  if (fs.existsSync(LOG_FILE)) {
+    logs = JSON.parse(fs.readFileSync(LOG_FILE, 'utf8'));
+  }
+} catch(e) { logs = []; }
+
+// Log kaydet
+function addLog(type, data, req) {
+  const entry = {
+    id: Date.now(),
+    type,
+    timestamp: new Date().toISOString(),
+    ip: req.ip || req.headers['x-forwarded-for'] || 'unknown',
+    lang: req.headers['accept-language']?.slice(0, 5) || 'unknown',
+    ...data
+  };
+  logs.unshift(entry);
+  if (logs.length > 5000) logs = logs.slice(0, 5000);
+  fs.writeFile(LOG_FILE, JSON.stringify(logs), () => {});
+}
+
 // ===== GÜVENLİK YARDIMCI FONKSİYONLAR =====
 
-// App ID sadece sayı olmalı, max 10 haneli
 function isValidAppId(appid) {
   return /^\d{1,10}$/.test(String(appid));
 }
 
-// URL whitelist — sadece Steam/Akamai/Fastly CDN'lerinden indirmeye izin
 const ALLOWED_DOMAINS = [
   'cdn.cloudflare.steamstatic.com',
   'cdn.akamai.steamstatic.com',
@@ -81,13 +106,12 @@ function isAllowedUrl(url) {
   } catch { return false; }
 }
 
-// Filename sanitize — directory traversal önleme
 function sanitizeFilename(name) {
   if (!name) return 'asset';
   return String(name).replace(/[^a-zA-Z0-9_.-]/g, '_').slice(0, 100);
 }
 
-// Cache sistemi — 1 saat geçerli
+// Cache sistemi — 1 saat
 const cache = new Map();
 const CACHE_TTL = 60 * 60 * 1000;
 function getCache(key) {
@@ -103,6 +127,8 @@ const HEADERS = {
   'Accept-Language': 'tr-TR,tr;q=0.9,en;q=0.8',
   'Referer': 'https://store.steampowered.com/',
 };
+
+// ===== API ENDPOINT'LERİ =====
 
 // Oyun bilgisi
 app.get('/api/game/:appid', async (req, res) => {
@@ -129,8 +155,14 @@ app.get('/api/items/:appid', heavyLimiter, async (req, res) => {
   if (!isValidAppId(appid)) return res.status(400).json({ error: 'Geçersiz App ID' });
   const cacheKey = `items_${appid}`;
   const cached = getCache(cacheKey);
-  if (cached) { console.log(`Cache hit: ${appid}`); return res.json(cached); }
+  if (cached) {
+    console.log(`Cache hit: ${appid}`);
+    addLog('items', { appid, cached: true }, req);
+    return res.json(cached);
+  }
   console.log(`Cache miss: ${appid} — Puppeteer başlatılıyor...`);
+  addLog('items', { appid, cached: false }, req);
+
   const items = [];
   const seen = new Set();
 
@@ -196,7 +228,6 @@ app.get('/api/items/:appid', heavyLimiter, async (req, res) => {
       { name: 'Steam_Language', value: 'turkish', domain: 'store.steampowered.com' }
     );
 
-    // Network isteklerini dinle
     const netUrls = new Set();
     page.on('response', res => {
       const url = res.url();
@@ -211,7 +242,6 @@ app.get('/api/items/:appid', heavyLimiter, async (req, res) => {
     });
     await new Promise(r => setTimeout(r, 5000));
 
-    // DOM'dan topla
     const domUrls = await page.evaluate(() => {
       const found = [];
       document.querySelectorAll('video source[src], img[src]').forEach(el => {
@@ -223,7 +253,6 @@ app.get('/api/items/:appid', heavyLimiter, async (req, res) => {
 
     await browser.close();
 
-    // Puppeteer'dan gelen URL'lerden isim ve tür bilgisini düzgün çıkar
     const allPuppeteerUrls = [...new Set([...netUrls, ...domUrls])];
     let puppeteerIndex = 1;
     allPuppeteerUrls.forEach(url => {
@@ -233,10 +262,9 @@ app.get('/api/items/:appid', heavyLimiter, async (req, res) => {
       const isEmote = url.includes('emot') || url.includes('emoji');
       const isAvatar = url.includes('avatar');
       let type = isVideo ? 'Animasyonlu Arka Plan' : isFrame ? 'Avatar Çerçeve' : isEmote ? 'Emoticon' : isAvatar ? 'Avatar' : 'Arka Plan';
-      // Hash ismi yerine anlamlı isim
       const rawName = url.split('/').pop().split('.')[0];
       const isHash = /^[a-f0-9]{32,}$/i.test(rawName);
-      const name = isHash ? `${type} #${puppeteerIndex++}` : rawName.replace(/_/g,' ');
+      const name = isHash ? `${type} #${puppeteerIndex++}` : rawName.replace(/_/g, ' ');
       addItem(name, type, isVideo ? 1 : 0, isVideo ? null : url, isVideo ? url : null);
     });
   } catch (e) { console.log('puppeteer hata:', e.message); }
@@ -246,7 +274,7 @@ app.get('/api/items/:appid', heavyLimiter, async (req, res) => {
   res.json(result);
 });
 
-// Oyun detay (fiyat, puan, tarih, geliştirici)
+// Oyun detay
 app.get('/api/gamedetail/:appid', async (req, res) => {
   const { appid } = req.params;
   if (!isValidAppId(appid)) return res.status(400).json({ error: 'Geçersiz App ID' });
@@ -262,7 +290,7 @@ app.get('/api/gamedetail/:appid', async (req, res) => {
       score: d.metacritic?.score || null,
       releaseDate: d.release_date?.date || null,
       developer: d.developers?.[0] || null,
-      genres: d.genres?.slice(0,3).map(g=>g.description) || [],
+      genres: d.genres?.slice(0, 3).map(g => g.description) || [],
     };
     setCache(cacheKey, result);
     res.json(result);
@@ -276,6 +304,7 @@ app.get('/api/search', async (req, res) => {
   try {
     const r = await axios.get(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(q)}&l=turkish&cc=TR`, { headers: HEADERS, timeout: 10000 });
     const items = (r.data?.items || []).slice(0, 10).map(i => ({ appid: String(i.id), name: String(i.name).slice(0, 100) }));
+    addLog('search', { query: q, results: items.length }, req);
     res.json(items);
   } catch(e) { res.json([]); }
 });
@@ -284,17 +313,17 @@ app.get('/api/search', async (req, res) => {
 app.post('/api/zip', zipLimiter, async (req, res) => {
   const { items, appid, gameName } = req.body;
 
-  // Validation
   if (!Array.isArray(items) || !items.length) return res.status(400).json({ error: 'Öğe bulunamadı' });
   if (items.length > 100) return res.status(400).json({ error: 'Çok fazla öğe (max 100)' });
   if (!isValidAppId(appid)) return res.status(400).json({ error: 'Geçersiz App ID' });
 
-  // URL'leri whitelist kontrolü
   const validItems = items.filter(item => {
     const url = item.videoUrl || item.imgUrl;
     return url && isAllowedUrl(url);
   });
   if (!validItems.length) return res.status(400).json({ error: 'Geçerli URL bulunamadı' });
+
+  addLog('zip', { appid, gameName, itemCount: validItems.length }, req);
 
   const safeName = sanitizeFilename(gameName || appid);
   res.setHeader('Content-Disposition', `attachment; filename="${safeName}_assets.zip"`);
@@ -308,7 +337,7 @@ app.post('/api/zip', zipLimiter, async (req, res) => {
     try {
       const ext = sanitizeFilename(url.split('.').pop().split('?')[0]);
       const fname = `${sanitizeFilename(item.type || 'item')}/${sanitizeFilename(item.name)}.${ext}`;
-      const r = await axios.get(url, { responseType: 'stream', headers: HEADERS, timeout: 15000, maxContentLength: 50 * 1024 * 1024 }); // max 50MB
+      const r = await axios.get(url, { responseType: 'stream', headers: HEADERS, timeout: 15000, maxContentLength: 50 * 1024 * 1024 });
       archive.append(r.data, { name: fname });
     } catch(e) { console.log(`ZIP hata (${item.name}):`, e.message); }
   }
@@ -316,10 +345,11 @@ app.post('/api/zip', zipLimiter, async (req, res) => {
   archive.finalize();
 });
 
-// Proxy indirme (whitelisted URL'ler için)
+// Proxy indirme
 app.get('/api/download', async (req, res) => {
   const { url, filename } = req.query;
   if (!url || !isAllowedUrl(url)) return res.status(400).json({ error: 'Geçersiz veya izinsiz URL' });
+  addLog('download', { filename: filename || url.split('/').slice(-1)[0] }, req);
   try {
     const r = await axios.get(url, { responseType: 'stream', headers: HEADERS, timeout: 15000, maxContentLength: 50 * 1024 * 1024 });
     const ext = sanitizeFilename(String(url).split('.').pop().split('?')[0]);
@@ -330,6 +360,134 @@ app.get('/api/download', async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: 'İndirme hatası' });
   }
+});
+
+// ===== ADMIN DASHBOARD =====
+app.get('/admin', (req, res) => {
+  if (req.query.key !== ADMIN_KEY) {
+    return res.status(403).send('Yetkisiz erişim');
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const todayLogs = logs.filter(l => l.timestamp.startsWith(today));
+
+  const searches = logs.filter(l => l.type === 'search');
+  const topQueries = searches.reduce((acc, l) => {
+    acc[l.query] = (acc[l.query] || 0) + 1;
+    return acc;
+  }, {});
+  const topQueriesSorted = Object.entries(topQueries).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+  const downloads = logs.filter(l => l.type === 'download' || l.type === 'zip');
+
+  const topAppids = logs.filter(l => l.appid).reduce((acc, l) => {
+    acc[l.appid] = (acc[l.appid] || 0) + 1;
+    return acc;
+  }, {});
+  const topAppidsSorted = Object.entries(topAppids).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+  const last7 = {};
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    last7[d] = logs.filter(l => l.timestamp.startsWith(d)).length;
+  }
+
+  const maxDay = Math.max(...Object.values(last7), 1);
+
+  res.send(`<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SteamDL Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0f1a; color: #c7d5e0; font-family: 'Segoe UI', sans-serif; padding: 24px; min-height: 100vh; }
+    h1 { color: #66c0f4; font-size: 22px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+    h2 { color: #66c0f4; font-size: 12px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .card { background: #1b2838; border-radius: 8px; padding: 18px; border: 1px solid #2a3f5f; }
+    .card .num { font-size: 28px; font-weight: bold; color: #66c0f4; }
+    .card .label { font-size: 12px; color: #8f98a0; margin-top: 4px; }
+    .section { background: #1b2838; border-radius: 8px; padding: 18px; margin-bottom: 20px; border: 1px solid #2a3f5f; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media(max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 8px 10px; color: #66c0f4; border-bottom: 1px solid #2a3f5f; font-size: 12px; }
+    td { padding: 7px 10px; border-bottom: 1px solid #16202d; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #16202d; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+    .badge-search  { background: #1a3a5c; color: #66c0f4; }
+    .badge-items   { background: #1a3a1a; color: #4caf50; }
+    .badge-download{ background: #3a1a1a; color: #ef5350; }
+    .badge-zip     { background: #3a2a1a; color: #ff9800; }
+    .bar-wrap { background: #16202d; border-radius: 4px; height: 8px; width: 100%; }
+    .bar { height: 8px; background: #66c0f4; border-radius: 4px; }
+    a { color: #66c0f4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .empty { color: #4a5568; font-size: 13px; padding: 8px 0; }
+  </style>
+</head>
+<body>
+  <h1>🎮 SteamDL Analytics</h1>
+
+  <div class="grid">
+    <div class="card"><div class="num">${logs.length}</div><div class="label">Toplam İşlem</div></div>
+    <div class="card"><div class="num">${todayLogs.length}</div><div class="label">Bugün</div></div>
+    <div class="card"><div class="num">${searches.length}</div><div class="label">Toplam Arama</div></div>
+    <div class="card"><div class="num">${downloads.length}</div><div class="label">İndirme</div></div>
+    <div class="card"><div class="num">${new Set(logs.map(l => l.ip)).size}</div><div class="label">Tekil IP</div></div>
+  </div>
+
+  <div class="section">
+    <h2>📅 Son 7 Gün</h2>
+    <table>
+      <tr><th>Tarih</th><th>İşlem</th><th style="width:60%">Graf</th></tr>
+      ${Object.entries(last7).map(([d, n]) => `
+        <tr>
+          <td>${d}</td>
+          <td>${n}</td>
+          <td><div class="bar-wrap"><div class="bar" style="width:${Math.round((n / maxDay) * 100)}%"></div></div></td>
+        </tr>`).join('')}
+    </table>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <h2>🔍 En Çok Arananlar</h2>
+      ${topQueriesSorted.length ? `
+      <table>
+        <tr><th>Arama</th><th>Sayı</th></tr>
+        ${topQueriesSorted.map(([q, n]) => `<tr><td>${q}</td><td>${n}</td></tr>`).join('')}
+      </table>` : '<div class="empty">Henüz veri yok</div>'}
+    </div>
+    <div class="section">
+      <h2>🎮 En Çok Görüntülenen App ID</h2>
+      ${topAppidsSorted.length ? `
+      <table>
+        <tr><th>App ID</th><th>Sayı</th></tr>
+        ${topAppidsSorted.map(([id, n]) => `<tr><td><a href="https://store.steampowered.com/app/${id}" target="_blank">${id}</a></td><td>${n}</td></tr>`).join('')}
+      </table>` : '<div class="empty">Henüz veri yok</div>'}
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📋 Son 50 İşlem</h2>
+    <table>
+      <tr><th>Zaman</th><th>Tür</th><th>Detay</th><th>IP</th><th>Dil</th></tr>
+      ${logs.slice(0, 50).map(l => `
+        <tr>
+          <td style="white-space:nowrap">${new Date(l.timestamp).toLocaleString('tr-TR')}</td>
+          <td><span class="badge badge-${l.type}">${l.type}</span></td>
+          <td>${l.query || l.appid || l.filename || '-'}</td>
+          <td style="font-size:11px;color:#8f98a0">${l.ip}</td>
+          <td style="font-size:11px;color:#8f98a0">${l.lang}</td>
+        </tr>`).join('')}
+    </table>
+  </div>
+</body>
+</html>`);
 });
 
 app.listen(PORT, () => console.log(`✅ Steam Downloader çalışıyor: http://localhost:${PORT}`));
